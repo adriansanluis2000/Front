@@ -1,6 +1,24 @@
 <h2>Listado de Productos</h2>
-<ul>
-    <li *ngFor="let producto of productos">
-        {{ producto.nombre }} - {{ producto.descripcion }} - ${{ producto.precio }}
-    </li>
-</ul>
+<table>
+  <!-- Encabezados de la tabla -->
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Precio</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <!-- Datos de los productos -->
+  <tbody>
+    <tr *ngFor="let producto of productos">
+      <td>{{ producto.nombre }}</td>
+      <td>{{ producto.descripcion }}</td>
+      <td>{{ producto.precio }} €</td>
+      <td>
+        <!-- Botón para eliminar producto -->
+        <button (click)="eliminarProducto(producto.id)">Eliminar</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
