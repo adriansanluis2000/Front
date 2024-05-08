@@ -1,14 +1,39 @@
 <h2>Añadir nuevo producto</h2>
-<form class="agregar-producto-form" (ngSubmit)="onSubmit()" #productoForm="ngForm">
+<form class="agregar-producto-form" (ngSubmit)="agregarProducto(productoForm)" #productoForm="ngForm">
 
     <label for="nombre">Nombre:</label>
-    <input type="text" id="nombre" name="nombre" [(ngModel)]="producto.nombre" required>
+    <input type="text" id="nombre" name="nombre" [(ngModel)]="producto.nombre" #nombre="ngModel" required>
+    <!-- Mensaje de error para el nombre -->
+    <div *ngIf="nombre.invalid" class="error" id="error-nombre">
+        <div *ngIf="nombre.errors?.['required']">El nombre del producto es obligatorio.</div>
+    </div>
+
 
     <label for="descripcion">Descripción:</label>
-    <input type="text" id="descripcion" name="descripcion" [(ngModel)]="producto.descripcion" required>
+    <input type="text" id="descripcion" name="descripcion" [(ngModel)]="producto.descripcion" #descripcion="ngModel">
+
 
     <label for="precio">Precio:</label>
-    <input type="number" id="precio" name="precio" [(ngModel)]="producto.precio" required>
+    <input type="number" id="precio" name="precio" [(ngModel)]="producto.precio" #precio="ngModel" required min="0.01">
+    <!-- Mensaje de error para el precio -->
+    <div *ngIf="precio.invalid" class="error" id="error-precio">
+        <div *ngIf="precio.errors?.['required']">El precio es obligatorio.</div>
+        <div *ngIf="precio.errors?.['min']">El precio debe ser mayor que 0.</div>
+    </div>
 
+
+    <label for="stock">Cantidad:</label>
+    <input type="number" id="stock" name="stock" [(ngModel)]="producto.stock" #stock="ngModel" required min="1">
+    <!-- Mensaje de error para la cantidad -->
+    <div *ngIf="stock.invalid" class="error" id="error-cantidad">
+        <div *ngIf="stock.errors?.['required']">La cantidad es obligatoria.</div>
+        <div *ngIf="stock.errors?.['min']">La cantidad mínima es 1.</div>
+    </div>
+
+
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+    
     <button type="submit" [disabled]="!productoForm.valid">Añadir Producto</button>
 </form>

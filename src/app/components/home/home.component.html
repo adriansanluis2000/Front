@@ -1,5 +1,14 @@
-<div class="home-container">
-    <h1>Bienvenido al Sistema de Gestión de Inventario</h1>
-    <a routerLink="/listaProductos">Lista de Productos</a>
-    <a routerLink="/agregarProducto">Agregar Productos</a>
-</div>
+<header>
+    <h1>Gestión de inventario</h1>
+</header>
+<main>
+    <aside>
+        <ul>
+            <li><a routerLink="/listaProductos">Productos</a></li>
+            <li><a routerLink="/agregarProducto">Añadir producto</a></li>
+        </ul>
+    </aside>
+    <section id="content">
+        <router-outlet></router-outlet>
+    </section>
+</main>
