@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { ProductoService } from '../../services/producto.service';
 import { FormsModule, FormControl, Validators, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -12,13 +12,12 @@ import { CommonModule } from '@angular/common';
   styleUrl: './agregar-producto.component.scss'
 })
 export class AgregarProductoComponent {
-  [x: string]: any;
 
   producto = {
     nombre: '',
     descripcion: '',
-    precio: 0,
-    stock: 1
+    precio: null,
+    stock: null
   };
 
   errorMessage: string = '';
@@ -27,25 +26,31 @@ export class AgregarProductoComponent {
 
   agregarProducto(form: NgForm) {
     if (form.valid) {
-      this.productoService.crearProducto(form.value).subscribe({
+      this.productoService.crearProducto(this.producto).subscribe({
         next: (data) => {
-          console.log('Producto añadido', data);
-          this.resetForm();
+          console.log('Producto añadido:', data);
+          this.resetForm(form);
         },
         error: (e) => {
           this.errorMessage = 'Error al agregar el producto, inténtalo de nuevo.';
-          console.error('Error al agregar el producto:', e)
+          console.error('Error al agregar el producto:', e);
         }
+      });
+    } else {
+      Object.keys(form.controls).forEach(field => {
+        const control = form.controls[field];
+        control.markAsTouched({ onlySelf: true }); // Cambiar a markAsTouched
       });
     }
   }
 
-  resetForm() {
+  resetForm(form : NgForm) {
+    form.resetForm();
     this.producto = {
       nombre: '',
       descripcion: '',
-      precio: 0,
-      stock: 1
+      precio: null,
+      stock: null
     };
   }
 }

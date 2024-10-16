@@ -2,12 +2,12 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
     {
-        path: 'home',
+        path: '',
         loadComponent: () =>
             import('./components/home/home.component').then(m => m.HomeComponent)
     },
     {
-        path: 'listaProductos',
+        path: 'productos',
         loadComponent: () => 
             import('./components/lista-productos/lista-productos.component').then(m => m.ListaProductosComponent),    
     },
@@ -15,10 +15,5 @@ export const routes: Routes = [
         path: 'agregarProducto',
         loadComponent: () =>
             import('./components/agregar-producto/agregar-producto.component').then(m =>  m.AgregarProductoComponent),
-    },
-    {
-        path: '',
-        redirectTo: 'home',
-        pathMatch: 'full'
     }
 ];

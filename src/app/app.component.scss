@@ -1,0 +1,79 @@
+/* Estilos globales */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estilo del header */
+header {
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  font-size: 1.5rem;
+
+  a {
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+  }
+}
+
+/* Diseño general con flexbox */
+.layout {
+  display: flex;
+  height: calc(100vh - 80px);
+  /* Altura menos el header */
+}
+
+/* Estilo de la barra de navegación (sidebar) */
+.sidebar {
+  width: 200px;
+  background-color: #333;
+  padding: 1rem;
+}
+
+.sidebar ul {
+  list-style-type: none;
+}
+
+.sidebar li {
+  margin: 1rem 0;
+}
+
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+.sidebar a.active {
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+.sidebar a:hover {
+  text-decoration: underline;
+}
+
+/* Estilo del contenido principal */
+.content {
+  flex: 1;
+  /* Para que ocupe el espacio restante */
+  padding: 1.5rem;
+  overflow-y: auto;
+  /* Permitir scroll si es necesario */
+}
+
+main {
+  background-color: #f4f4f4;
+  padding: 2rem;
+  min-height: 100%;
+}

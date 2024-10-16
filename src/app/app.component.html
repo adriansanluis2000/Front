@@ -1,1 +1,16 @@
-<router-outlet></router-outlet>
+<header>
+    <a routerLink="/">Bienvenido a la Gestión de Inventario</a>
+</header>
+
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li><a routerLink="/productos">Ver Productos</a></li>
+            <li><a routerLink="/agregarProducto">Añadir Producto</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <router-outlet></router-outlet>
+    </main>
+</div>
