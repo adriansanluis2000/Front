@@ -16,13 +16,13 @@ export class AgregarProductoComponent {
   producto = {
     nombre: '',
     descripcion: '',
-    precio: null,
-    stock: null
+    precio: 0,
+    stock: 1
   };
 
   errorMessage: string = '';
 
-  constructor(private productoService: ProductoService) { }
+  constructor(private readonly productoService: ProductoService) { }
 
   agregarProducto(form: NgForm) {
     if (form.valid) {
@@ -39,7 +39,7 @@ export class AgregarProductoComponent {
     } else {
       Object.keys(form.controls).forEach(field => {
         const control = form.controls[field];
-        control.markAsTouched({ onlySelf: true }); // Cambiar a markAsTouched
+        control.markAsTouched({ onlySelf: true });
       });
     }
   }
@@ -49,8 +49,8 @@ export class AgregarProductoComponent {
     this.producto = {
       nombre: '',
       descripcion: '',
-      precio: null,
-      stock: null
+      precio: 0,
+      stock: 1
     };
   }
 }
