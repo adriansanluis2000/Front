@@ -3,15 +3,13 @@ import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { AgregarProductoComponent } from './agregar-producto.component';
 import { ProductoService } from '../../services/producto.service';
 import { of, throwError } from 'rxjs';
-import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientModule } from '@angular/common/http';
 
 
 describe('AgregarProductoComponent', () => {
   let component: AgregarProductoComponent;
   let fixture: ComponentFixture<AgregarProductoComponent>;
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
-  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     productoServiceMock = jasmine.createSpyObj('ProductoService', ['crearProducto']);
@@ -21,12 +19,10 @@ describe('AgregarProductoComponent', () => {
       imports: [AgregarProductoComponent,
         FormsModule,
         ReactiveFormsModule,
-        HttpClientModule,
-        HttpClientTestingModule
+        HttpClientModule
       ]
     }).compileComponents();
 
-    httpTestingController = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(AgregarProductoComponent);
     component = fixture.componentInstance;
   });
