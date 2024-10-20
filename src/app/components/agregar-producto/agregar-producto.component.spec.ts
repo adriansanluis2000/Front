@@ -3,12 +3,15 @@ import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { AgregarProductoComponent } from './agregar-producto.component';
 import { ProductoService } from '../../services/producto.service';
 import { of, throwError } from 'rxjs';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+
 
 describe('AgregarProductoComponent', () => {
   let component: AgregarProductoComponent;
   let fixture: ComponentFixture<AgregarProductoComponent>;
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     productoServiceMock = jasmine.createSpyObj('ProductoService', ['crearProducto']);
@@ -18,9 +21,12 @@ describe('AgregarProductoComponent', () => {
       imports: [AgregarProductoComponent,
         FormsModule,
         ReactiveFormsModule,
-        HttpClientModule]
+        HttpClientModule,
+        HttpClientTestingModule
+      ]
     }).compileComponents();
 
+    httpTestingController = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(AgregarProductoComponent);
     component = fixture.componentInstance;
   });
@@ -114,7 +120,7 @@ describe('AgregarProductoComponent', () => {
     });
   });
 
-  describe('Prueba de cantidad negativa', () => {
+  describe('Prueba de cantidad negativa o 0', () => {
     it('Debería mostrar un mensaje de error por stock no positivo', () => {
       component.producto = {
         nombre: 'Producto Test',
@@ -154,6 +160,35 @@ describe('AgregarProductoComponent', () => {
 
       component.agregarProducto(form);
       expect(component.errorMessage).toBe('Error al agregar el producto, inténtalo de nuevo.');
+    });
+  });
+
+  describe('Pérdida de conexión a internet', () => {
+    it('Debería mostrar un mensaje de error en caso de pérdida de conexión a internet', () => {
+      // Producto de ejemplo que se intenta agregar
+      component.producto = {
+        nombre: 'Producto Test',
+        descripcion: 'Descripción Test',
+        precio: 100,
+        stock: 10
+      };
+
+      // Mock del servicio que simula una pérdida de conexión (status: 0)
+      productoServiceMock.crearProducto.and.returnValue(throwError({ status: 0 }));
+
+      // Mock del formulario (NgForm) con el valor del producto
+      const form: NgForm = {
+        valid: true,
+        value: component.producto,
+        controls: {},
+        resetForm: () => { }
+      } as unknown as NgForm;
+
+      // Llamar al método que intenta agregar el producto
+      component.agregarProducto(form);
+
+      // Verificar que se muestre el mensaje adecuado para un fallo de red
+      expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
     });
   });
 });

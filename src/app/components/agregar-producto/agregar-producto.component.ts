@@ -25,6 +25,26 @@ export class AgregarProductoComponent {
   constructor(private readonly productoService: ProductoService) { }
 
   agregarProducto(form: NgForm) {
+    // Primero, marca los campos como tocados si el formulario no es válido
+    if (!form.valid) {
+      Object.keys(form.controls).forEach(field => {
+        const control = form.controls[field];
+        control.markAsTouched({ onlySelf: true });
+      });
+    }
+
+    // Validación específica de valores antes de continuar
+    if (this.producto.precio <= 0) {
+      this.errorMessage = 'El precio debe ser mayor que 0.';
+      return;
+    }
+
+    if (this.producto.stock <= 0) {
+      this.errorMessage = 'La cantidad mínima es 1.';
+      return;
+    }
+
+    // Si el formulario es válido, continúa con el proceso normal
     if (form.valid) {
       this.productoService.crearProducto(this.producto).subscribe({
         next: (data) => {
@@ -32,19 +52,19 @@ export class AgregarProductoComponent {
           this.resetForm(form);
         },
         error: (e) => {
-          this.errorMessage = 'Error al agregar el producto, inténtalo de nuevo.';
-          console.error('Error al agregar el producto:', e);
+          if (e.status === 0) {
+            this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
+          } else {
+            this.errorMessage = 'Error al agregar el producto, inténtalo de nuevo.';
+          }
         }
-      });
-    } else {
-      Object.keys(form.controls).forEach(field => {
-        const control = form.controls[field];
-        control.markAsTouched({ onlySelf: true });
       });
     }
   }
 
-  resetForm(form : NgForm) {
+
+
+  resetForm(form: NgForm) {
     form.resetForm();
     this.producto = {
       nombre: '',
