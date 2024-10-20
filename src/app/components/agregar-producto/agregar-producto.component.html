@@ -9,7 +9,7 @@
     </div>
 
     <label for="descripcion">Descripción:</label>
-    <input type="text" id="descripcion" name="descripcion" [(ngModel)]="producto.descripcion" #descripcion="ngModel">
+    <textarea id="descripcion" name="descripcion" [(ngModel)]="producto.descripcion" #descripcion="ngModel" rows="4"></textarea>
 
     <label for="precio">Precio:</label>
     <input type="number" id="precio" name="precio" [(ngModel)]="producto.precio" #precio="ngModel" required min="1">
