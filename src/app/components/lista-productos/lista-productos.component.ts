@@ -15,6 +15,7 @@ export class ListaProductosComponent implements OnInit {
   productos: any[] = [];
   productoSeleccionado: any;
   productoForm: FormGroup;
+  ordenAscendente: boolean = true; // Controla el orden ascendente o descendente
   
   constructor(
     private readonly productoService: ProductoService,
@@ -89,6 +90,27 @@ export class ListaProductosComponent implements OnInit {
     } else {
       console.log('Formulario no válido o producto no seleccionado');
     }
+  }
+
+
+  // Método para ordenar por nombre
+  ordenarPorNombre(): void {
+    this.productos.sort((a, b) => {
+      const nombreA = a.nombre.toLowerCase();
+      const nombreB = b.nombre.toLowerCase();
+      return this.ordenAscendente
+        ? nombreA.localeCompare(nombreB)
+        : nombreB.localeCompare(nombreA);
+    });
+    this.ordenAscendente = !this.ordenAscendente; // Cambia el estado para la próxima ordenación
+  }
+
+  // Método para ordenar por stock
+  ordenarPorStock(): void {
+    this.productos.sort((a, b) => {
+      return this.ordenAscendente ? a.stock - b.stock : b.stock - a.stock;
+    });
+    this.ordenAscendente = !this.ordenAscendente; // Cambia el estado para la próxima ordenación
   }
 
 }

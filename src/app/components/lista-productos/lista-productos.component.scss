@@ -28,14 +28,6 @@ tr:hover {
   background-color: #ddd;
 }
 
-button {
-  background-color: #dc3545;
-}
-
-button:hover {
-  background-color: #c82333;
-}
-
 /* Estilos para el modal */
 .modal {
   display: block;
@@ -58,17 +50,18 @@ button:hover {
 }
 
 .close {
-  color: #aaa;
   float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
+  font-size: 20px;
+  border: none;
+  background: #c82333;
   cursor: pointer;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: #a71d2a;
+  }
 }
 
 .no-products-message {
@@ -84,4 +77,48 @@ button:hover {
 
 .no-products-message p {
   margin: 0;
+}
+
+.sort-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 1rem;
+
+  &:hover {
+    color: #007bff;
+  }
+}
+
+.action-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 1.2rem;
+  padding: 8px;
+  border-radius: 4px;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+
+  &:hover {
+    background-color: #c82333;
+  }
+}
+
+.edit-button {
+  background-color: #ff9800;
+  color: white;
+
+  &:hover {
+    background-color: #e68900;
+  }
 }

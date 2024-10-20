@@ -1,17 +1,26 @@
 <h2>Listado de Productos</h2>
+
 <table>
-  <!-- Encabezados de la tabla -->
   <thead>
     <tr>
-      <th>Nombre</th>
+      <th>
+        Nombre
+        <button (click)="ordenarPorNombre()" aria-label="Ordenar por nombre" class="sort-button">
+          <i [class]="ordenAscendente ? 'fas fa-sort-alpha-down' : 'fas fa-sort-alpha-up'"></i>
+        </button>
+      </th>
       <th>Descripción</th>
       <th>Precio</th>
-      <th>Stock</th>
+      <th>
+        Stock
+        <button (click)="ordenarPorStock()" aria-label="Ordenar por stock" class="sort-button">
+          <i [class]="ordenAscendente ? 'fas fa-sort-numeric-down' : 'fas fa-sort-numeric-up'"></i>
+        </button>
+      </th>
       <th>Acciones</th>
     </tr>
   </thead>
 
-  <!-- Datos de los productos -->
   <tbody>
     <!-- Mostrar mensaje si no hay productos -->
     <tr *ngIf="productos.length === 0">
@@ -25,8 +34,13 @@
       <td>{{ producto.precio }} €</td>
       <td>{{ producto.stock }}</td>
       <td>
-        <button (click)="eliminarProducto(producto.id)">Eliminar</button>
-        <button (click)="abrirModal(producto)">Editar</button>
+        <button (click)="eliminarProducto(producto.id)" aria-label="Eliminar producto"
+          class="action-button delete-button">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <button (click)="abrirModal(producto)" aria-label="Editar producto" class="action-button edit-button">
+          <i class="fas fa-edit"></i>
+        </button>
       </td>
     </tr>
   </tbody>
@@ -34,7 +48,6 @@
 
 <!-- Modal para editar producto -->
 <dialog *ngIf="productoSeleccionado" class="modal" tabindex="-1" style="display: block;">
-  <html class="modal-dialog">
   <div class="modal-content">
     <div class="modal-header">
       <h5 class="modal-title">Editar Producto</h5>
@@ -62,6 +75,4 @@
       </form>
     </div>
   </div>
-
-  </html>
 </dialog>
