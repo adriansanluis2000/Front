@@ -10,8 +10,15 @@
       <th>Acciones</th>
     </tr>
   </thead>
+
   <!-- Datos de los productos -->
   <tbody>
+    <!-- Mostrar mensaje si no hay productos -->
+    <tr *ngIf="productos.length === 0">
+      <td colspan="5" class="no-products-message">
+        <p>No hay productos registrados actualmente.</p>
+      </td>
+    </tr>
     <tr *ngFor="let producto of productos">
       <td>{{ producto.nombre }}</td>
       <td>{{ producto.descripcion }}</td>
@@ -28,32 +35,33 @@
 <!-- Modal para editar producto -->
 <dialog *ngIf="productoSeleccionado" class="modal" tabindex="-1" style="display: block;">
   <html class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Editar Producto</h5>
-        <button type="button" class="close" (click)="cerrarModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()">
-          <div class="form-group">
-            <label for="nombre">Nombre</label>
-            <input id="nombre" class="form-control" formControlName="nombre" />
-          </div>
-          <div class="form-group">
-            <label for="descripcion">Descripción</label>
-            <input id="descripcion" class="form-control" formControlName="descripcion" />
-          </div>
-          <div class="form-group">
-            <label for="precio">Precio</label>
-            <input id="precio" class="form-control" type="number" formControlName="precio" />
-          </div>
-          <div class="form-group">
-            <label for="stock">Stock</label>
-            <input id="stock" class="form-control" type="number" formControlName="stock" />
-          </div>
-          <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
-      </div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Editar Producto</h5>
+      <button type="button" class="close" (click)="cerrarModal()">×</button>
     </div>
+    <div class="modal-body">
+      <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()">
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" class="form-control" formControlName="nombre" />
+        </div>
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <input id="descripcion" class="form-control" formControlName="descripcion" />
+        </div>
+        <div class="form-group">
+          <label for="precio">Precio</label>
+          <input id="precio" class="form-control" type="number" formControlName="precio" />
+        </div>
+        <div class="form-group">
+          <label for="stock">Stock</label>
+          <input id="stock" class="form-control" type="number" formControlName="stock" />
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </form>
+    </div>
+  </div>
+
   </html>
 </dialog>
