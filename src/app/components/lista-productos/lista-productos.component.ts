@@ -23,7 +23,7 @@ export class ListaProductosComponent implements OnInit {
   ) {
     this.productoForm = this.fb.group({
       nombre: ['', Validators.required],
-      descripcion: ['', Validators.required],
+      descripcion: [''],
       precio: ['', [Validators.required, Validators.min(0)]],
       stock: ['', [Validators.required, Validators.min(0)]]
     });
