@@ -3,7 +3,6 @@ import { ProductoService } from '../../services/producto.service';
 import { NgFor, NgIf } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
-
 @Component({
   selector: 'app-lista-productos',
   standalone: true,
@@ -16,7 +15,9 @@ export class ListaProductosComponent implements OnInit {
   productoSeleccionado: any;
   productoForm: FormGroup;
   ordenAscendente: boolean = true; // Controla el orden ascendente o descendente
-  
+
+  errorMessage: string = '';
+
   constructor(
     private readonly productoService: ProductoService,
     private readonly fb: FormBuilder,
@@ -34,14 +35,18 @@ export class ListaProductosComponent implements OnInit {
   }
 
   obtenerProductos(): void {
-    this.productoService.obtenerProductos().subscribe(
-      (data: any[]) => {
+    this.productoService.obtenerProductos().subscribe({
+      next: (data: any[]) => {
         this.productos = data;
       },
-      (error) => {
-        console.error('Error al obtener productos', error);
+      error: (e) => {
+        if (e.status === 0) {
+          this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
+        } else {
+          this.errorMessage = 'Error al obtener productos'
+        }
       }
-    );
+    });
   }
 
   eliminarProducto(id: number): void {
@@ -57,7 +62,6 @@ export class ListaProductosComponent implements OnInit {
   abrirModal(producto: any): void {
     this.productoSeleccionado = producto;
 
-    // Rellena el formulario con los datos del producto seleccionado
     this.productoForm.patchValue({
       nombre: producto.nombre,
       descripcion: producto.descripcion,
@@ -92,8 +96,6 @@ export class ListaProductosComponent implements OnInit {
     }
   }
 
-
-  // Método para ordenar por nombre
   ordenarPorNombre(): void {
     this.productos.sort((a, b) => {
       const nombreA = a.nombre.toLowerCase();
@@ -102,15 +104,14 @@ export class ListaProductosComponent implements OnInit {
         ? nombreA.localeCompare(nombreB)
         : nombreB.localeCompare(nombreA);
     });
-    this.ordenAscendente = !this.ordenAscendente; // Cambia el estado para la próxima ordenación
+    this.ordenAscendente = !this.ordenAscendente;
   }
 
-  // Método para ordenar por stock
   ordenarPorStock(): void {
     this.productos.sort((a, b) => {
       return this.ordenAscendente ? a.stock - b.stock : b.stock - a.stock;
     });
-    this.ordenAscendente = !this.ordenAscendente; // Cambia el estado para la próxima ordenación
+    this.ordenAscendente = !this.ordenAscendente;
   }
 
 }
