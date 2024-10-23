@@ -50,13 +50,17 @@ export class ListaProductosComponent implements OnInit {
   }
 
   eliminarProducto(id: number): void {
-    this.productoService.eliminarProducto(id).subscribe({
-      next: () => {
-        console.log('any eliminado con éxito');
-        this.ngOnInit();
-      },
-      error: (e) => console.error('Error al eliminar producto', e)
-    });
+    const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar este producto?');
+    if (confirmacion) {
+      this.productoService.eliminarProducto(id).subscribe(
+        () => {
+          this.productos = this.productos.filter(producto => producto.id !== id);
+        },
+        (error) => {
+          console.error('Error al eliminar producto', error);
+        }
+      );
+    }
   }
 
   abrirModal(producto: any): void {

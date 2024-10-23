@@ -11,7 +11,7 @@ describe('ListaProductosComponent', () => {
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
 
   beforeEach(async () => {
-    productoServiceMock = jasmine.createSpyObj('ProductoService', ['obtenerProductos']);
+    productoServiceMock = jasmine.createSpyObj('ProductoService', ['obtenerProductos', 'eliminarProducto']);
 
     TestBed.configureTestingModule({
       imports: [
@@ -99,5 +99,44 @@ describe('ListaProductosComponent', () => {
       component.ordenarPorStock();
       expect(component.productos[0].stock).toBe(10);
     });
+  });
+
+  describe('Eliminar producto', () => {
+    const productId = 1;
+
+    it('Debería eliminar el producto seleccionado', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      productoServiceMock.eliminarProducto.and.returnValue(of({}));
+      component.eliminarProducto(productId);
+
+      expect(productoServiceMock.eliminarProducto).toHaveBeenCalledWith(productId);
+    });
+
+    it('No elimina el producto si el usuario cancela la acción', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+      component.eliminarProducto(productId);
+
+      expect(productoServiceMock.eliminarProducto).not.toHaveBeenCalled();
+    })
+
+    it('Debería mostrar un fallo en la base de datos', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      productoServiceMock.eliminarProducto.and.returnValue(throwError('Database error'));
+      spyOn(console, 'error');
+      component.eliminarProducto(productId);
+
+      expect(productoServiceMock.eliminarProducto).toHaveBeenCalledWith(productId);
+      expect(console.error).toHaveBeenCalledWith('Error al eliminar producto', 'Database error');
+    })
+
+    it('Debería mostrar un fallo por pérdida de conexión a internet', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      productoServiceMock.eliminarProducto.and.returnValue(throwError('No internet connection'));
+      spyOn(console, 'error');
+      component.eliminarProducto(productId);
+
+      expect(productoServiceMock.eliminarProducto).toHaveBeenCalledWith(productId);
+      expect(console.error).toHaveBeenCalledWith('Error al eliminar producto', 'No internet connection');
+    })
   });
 });
