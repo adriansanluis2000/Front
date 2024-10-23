@@ -25,6 +25,9 @@ export class AgregarProductoComponent {
   constructor(private readonly productoService: ProductoService) { }
 
   agregarProducto(form: NgForm) {
+    // Restablece el mensaje de error al iniciar la adición de un nuevo producto
+    this.errorMessage = '';
+
     // Primero, marca los campos como tocados si el formulario no es válido
     if (!form.valid) {
       Object.keys(form.controls).forEach(field => {
@@ -44,25 +47,37 @@ export class AgregarProductoComponent {
       return;
     }
 
-    // Si el formulario es válido, continúa con el proceso normal
-    if (form.valid) {
-      this.productoService.crearProducto(this.producto).subscribe({
-        next: (data) => {
-          console.log('Producto añadido:', data);
-          this.resetForm(form);
-        },
-        error: (e) => {
-          if (e.status === 0) {
-            this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
-          } else {
-            this.errorMessage = 'Error al agregar el producto, inténtalo de nuevo.';
-          }
+    // Verificar si el nombre del producto ya existe
+    this.productoService.verificarNombreProducto(this.producto.nombre).subscribe({
+      next: (exists) => {
+        if (exists) {
+          this.errorMessage = 'El nombre del producto ya existe. Por favor, elige otro nombre.';
+          return;
         }
-      });
-    }
+
+        // Si el formulario es válido y el nombre no existe, continúa con el proceso normal
+        if (form.valid) {
+          this.productoService.crearProducto(this.producto).subscribe({
+            next: (data) => {
+              console.log('Producto añadido:', data);
+              this.resetForm(form);
+            },
+            error: (e) => {
+              if (e.status === 0) {
+                this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
+              } else {
+                this.errorMessage = 'Error al agregar el producto, inténtalo de nuevo.';
+              }
+            }
+          });
+        }
+      },
+      error: (e) => {
+        this.errorMessage = 'Error al verificar el nombre del producto. Inténtalo de nuevo.';
+        console.error(e);
+      }
+    });
   }
-
-
 
   resetForm(form: NgForm) {
     form.resetForm();

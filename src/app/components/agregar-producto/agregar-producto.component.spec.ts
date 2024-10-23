@@ -12,11 +12,12 @@ describe('AgregarProductoComponent', () => {
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
 
   beforeEach(() => {
-    productoServiceMock = jasmine.createSpyObj('ProductoService', ['crearProducto']);
+    productoServiceMock = jasmine.createSpyObj('ProductoService', ['crearProducto', 'verificarNombreProducto']);
 
     TestBed.configureTestingModule({
       providers: [{ provide: ProductoService, useValue: productoServiceMock }],
-      imports: [AgregarProductoComponent,
+      imports: [
+        AgregarProductoComponent,
         FormsModule,
         ReactiveFormsModule,
         HttpClientModule
@@ -36,6 +37,7 @@ describe('AgregarProductoComponent', () => {
         stock: 10
       };
 
+      productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
       productoServiceMock.crearProducto.and.returnValue(of({ success: true }));
 
       const form: NgForm = {
@@ -53,8 +55,8 @@ describe('AgregarProductoComponent', () => {
     });
   });
 
-  describe('Prueba de error por campo vacío', () => {
-    it('Debería resaltar los campos vacíos y mostrar mensaje de error', () => {
+  describe('Prueba de error por campos requeridos', () => {
+    it('Debería resaltar los campos vacíos y mostrar mensajes de error', () => {
       const form: NgForm = {
         valid: false,
         controls: {
@@ -74,7 +76,7 @@ describe('AgregarProductoComponent', () => {
   });
 
   describe('Prueba de error por duplicidad', () => {
-    it('Debería mostrar un mensaje de error por producto duplicado', () => {
+    it('Debería mostrar un mensaje de error si el nombre del producto ya existe', () => {
       component.producto = {
         nombre: 'Producto Duplicado',
         descripcion: 'Descripción Duplicado',
@@ -82,7 +84,7 @@ describe('AgregarProductoComponent', () => {
         stock: 10
       };
 
-      productoServiceMock.crearProducto.and.returnValue(throwError({ status: 409 }));
+      productoServiceMock.verificarNombreProducto.and.returnValue(of(true));
 
       const form: NgForm = {
         valid: true,
@@ -92,12 +94,39 @@ describe('AgregarProductoComponent', () => {
       } as unknown as NgForm;
 
       component.agregarProducto(form);
-      expect(component.errorMessage).toBe('Error al agregar el producto, inténtalo de nuevo.');
+      expect(component.errorMessage).toBe('El nombre del producto ya existe. Por favor, elige otro nombre.');
     });
+
+    it('Debería agregar el producto correctamente con un nombre único', () => {
+      component.producto = {
+        nombre: 'Producto Único',
+        descripcion: 'Descripción Única',
+        precio: 100,
+        stock: 10
+      };
+
+      productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
+      productoServiceMock.crearProducto.and.returnValue(of({ success: true }));
+
+      const form: NgForm = {
+        valid: true,
+        value: component.producto,
+        controls: {},
+        resetForm: () => { }
+      } as unknown as NgForm;
+
+      spyOn(component, 'resetForm');
+      component.agregarProducto(form);
+
+      expect(productoServiceMock.crearProducto).toHaveBeenCalledWith(component.producto);
+      expect(component.resetForm).toHaveBeenCalled();
+      expect(component.errorMessage).toBe(''); // Asegurarse de que no hay mensajes de error
+    });
+
   });
 
-  describe('Prueba de precio negativo', () => {
-    it('Debería mostrar un mensaje de error por precio negativo', () => {
+  describe('Prueba de precio negativo o 0', () => {
+    it('Debería mostrar un mensaje de error si el precio es menor o igual a 0', () => {
       component.producto = {
         nombre: 'Producto Test',
         descripcion: 'Descripción Test',
@@ -117,7 +146,7 @@ describe('AgregarProductoComponent', () => {
   });
 
   describe('Prueba de cantidad negativa o 0', () => {
-    it('Debería mostrar un mensaje de error por stock no positivo', () => {
+    it('Debería mostrar un mensaje de error si la cantidad es menor o igual a 0', () => {
       component.producto = {
         nombre: 'Producto Test',
         descripcion: 'Descripción Test',
@@ -145,6 +174,7 @@ describe('AgregarProductoComponent', () => {
         stock: 10
       };
 
+      productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
       productoServiceMock.crearProducto.and.returnValue(throwError({ status: 500 }));
 
       const form: NgForm = {
@@ -161,7 +191,6 @@ describe('AgregarProductoComponent', () => {
 
   describe('Pérdida de conexión a internet', () => {
     it('Debería mostrar un mensaje de error en caso de pérdida de conexión a internet', () => {
-      // Producto de ejemplo que se intenta agregar
       component.producto = {
         nombre: 'Producto Test',
         descripcion: 'Descripción Test',
@@ -169,10 +198,11 @@ describe('AgregarProductoComponent', () => {
         stock: 10
       };
 
+      productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
+
       // Mock del servicio que simula una pérdida de conexión (status: 0)
       productoServiceMock.crearProducto.and.returnValue(throwError({ status: 0 }));
 
-      // Mock del formulario (NgForm) con el valor del producto
       const form: NgForm = {
         valid: true,
         value: component.producto,
@@ -180,10 +210,8 @@ describe('AgregarProductoComponent', () => {
         resetForm: () => { }
       } as unknown as NgForm;
 
-      // Llamar al método que intenta agregar el producto
       component.agregarProducto(form);
 
-      // Verificar que se muestre el mensaje adecuado para un fallo de red
       expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
     });
   });
