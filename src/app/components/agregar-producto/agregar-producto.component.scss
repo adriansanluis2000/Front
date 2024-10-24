@@ -16,21 +16,17 @@ button {
 
 textarea {
   resize: vertical;
-  /* Permite redimensionar verticalmente */
 }
 
 input.ng-invalid.ng-touched,
 textarea.ng-invalid.ng-touched {
   border: 2px solid rgba(255, 0, 0, 0.3);
-  /* Borde rojo suave para campos inválidos */
   background-color: rgba(255, 0, 0, 0.05);
-  /* Fondo rojo suave */
 }
 
 .error-message,
 .error div {
   color: red;
-  /* Color rojo para los mensajes de error */
 }
 
 button {
@@ -43,10 +39,8 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Aumentar la altura del campo de descripción */
 #descripcion {
   height: 80px;
-  /* Puedes ajustar este valor para hacerlo más alto */
 }
 
 .error {

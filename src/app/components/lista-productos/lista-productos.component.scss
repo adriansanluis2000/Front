@@ -41,7 +41,6 @@ tr:hover {
   background-color: #ddd;
 }
 
-/* Estilos para el modal */
 .modal {
   display: block;
   position: fixed;
@@ -70,6 +69,10 @@ tr:hover {
 
 .modal-body {
   margin-top: 20px;
+}
+
+textarea {
+  resize: vertical;
 }
 
 .close {
