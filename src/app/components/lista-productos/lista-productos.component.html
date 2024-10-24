@@ -1,5 +1,15 @@
 <h2>Listado de Productos</h2>
 
+<div class="search-container">
+  <input
+    type="text"
+    [(ngModel)]="busqueda"
+    (ngModelChange)="filtrarProductos()"
+    placeholder="Buscar producto..."
+    class="search-input"
+  />
+</div>
+
 <table>
   <thead>
     <tr>
@@ -23,12 +33,12 @@
 
   <tbody>
     <!-- Mostrar mensaje si no hay productos -->
-    <tr *ngIf="productos.length === 0">
+    <tr *ngIf="productosFiltrados.length === 0">
       <td colspan="5" class="no-products-message">
-        <p>No hay productos registrados actualmente.</p>
+        <p>No se encontraron productos.</p>
       </td>
     </tr>
-    <tr *ngFor="let producto of productos">
+    <tr *ngFor="let producto of productosFiltrados">
       <td>{{ producto.nombre }}</td>
       <td>{{ producto.descripcion }}</td>
       <td>{{ producto.precio }} €</td>

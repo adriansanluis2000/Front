@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductoService } from '../../services/producto.service';
 import { NgFor, NgIf } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-lista-productos',
   standalone: true,
-  imports: [NgFor, NgIf, ReactiveFormsModule],
+  imports: [NgFor, NgIf, FormsModule, ReactiveFormsModule],
   templateUrl: './lista-productos.component.html',
   styleUrl: './lista-productos.component.scss'
 })
@@ -14,9 +14,12 @@ export class ListaProductosComponent implements OnInit {
   productos: any[] = [];
   productoSeleccionado: any;
   productoForm: FormGroup;
-  ordenAscendente: boolean = true; // Controla el orden ascendente o descendente
+  ordenAscendente: boolean = true;
 
   errorMessage: string = '';
+
+  busqueda: string = '';
+  productosFiltrados: any[] = [];
 
   constructor(
     private readonly productoService: ProductoService,
@@ -34,10 +37,18 @@ export class ListaProductosComponent implements OnInit {
     this.obtenerProductos();
   }
 
+  filtrarProductos(): void {
+    console.log('Buscando:', this.busqueda);
+    this.productosFiltrados = this.productos.filter(producto =>
+      producto.nombre.toLowerCase().includes(this.busqueda.toLowerCase())
+    );
+  }
+
   obtenerProductos(): void {
     this.productoService.obtenerProductos().subscribe({
       next: (data: any[]) => {
         this.productos = data;
+        this.productosFiltrados = [...this.productos];
       },
       error: (e) => {
         if (e.status === 0) {
