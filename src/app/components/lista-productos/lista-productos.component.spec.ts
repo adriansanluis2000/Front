@@ -252,28 +252,28 @@ describe('ListaProductosComponent', () => {
     it('debería mostrar productos que coinciden con el nombre buscado', () => {
       component.busqueda = 'Gafas';
       component.filtrarProductos();
-      expect(component.productosFiltrados.length).toBe(2);
+      expect(component.productos.length).toBe(2);
     });
 
     it('debería mostrar mensaje de búsqueda sin resultados', () => {
       component.busqueda = 'No Existe';
       component.filtrarProductos();
-      expect(component.productosFiltrados.length).toBe(0);
+      expect(component.productos.length).toBe(0);
       expect(component.errorMessage).toBe('No se encontraron productos.');
     });
 
     it('debería mostrar productos con búsqueda parcial', () => {
       component.busqueda = 'Sol';
       component.filtrarProductos();
-      expect(component.productosFiltrados.length).toBe(1);
-      expect(component.productosFiltrados[0].nombre).toContain('Sol');
+      expect(component.productos.length).toBe(1);
+      expect(component.productos[0].nombre).toContain('Sol');
     });
 
     it('debería mostrar productos con búsqueda múltiple', () => {
       component.busqueda = 'Gafas Sol';
       component.filtrarProductos();
-      expect(component.productosFiltrados.length).toBe(1);
-      expect(component.productosFiltrados[0].nombre).toContain('Gafas');
+      expect(component.productos.length).toBe(1);
+      expect(component.productos[0].nombre).toContain('Gafas');
     });
   });
 });

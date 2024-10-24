@@ -17,9 +17,7 @@ export class ListaProductosComponent implements OnInit {
   ordenAscendente: boolean = true;
 
   errorMessage: string = '';
-
   busqueda: string = '';
-  productosFiltrados: any[] = [];
 
   constructor(
     private readonly productoService: ProductoService,
@@ -40,11 +38,11 @@ export class ListaProductosComponent implements OnInit {
   filtrarProductos(): void {
     const terminos = this.busqueda.split(' ').map(termino => termino.trim().toLowerCase()).filter(termino => termino !== '');
 
-    this.productosFiltrados = this.productos.filter(producto =>
+    this.productos = this.productos.filter(producto =>
       terminos.every(termino => producto.nombre.toLowerCase().includes(termino.toLowerCase()))
     );
 
-    if (this.productosFiltrados.length === 0) {
+    if (this.productos.length === 0) {
       this.errorMessage = 'No se encontraron productos.'
     } else {
       this.errorMessage = '';
@@ -55,7 +53,6 @@ export class ListaProductosComponent implements OnInit {
     this.productoService.obtenerProductos().subscribe({
       next: (data: any[]) => {
         this.productos = data;
-        this.productosFiltrados = [...this.productos];
       },
       error: (e) => {
         if (e.status === 0) {

@@ -33,12 +33,12 @@
 
   <tbody>
     <!-- Mostrar mensaje si no hay productos -->
-    <tr *ngIf="productosFiltrados.length === 0">
+    <tr *ngIf="productos.length === 0">
       <td colspan="5" class="no-products-message">
         <p>No se encontraron productos.</p>
       </td>
     </tr>
-    <tr *ngFor="let producto of productosFiltrados">
+    <tr *ngFor="let producto of productos">
       <td>{{ producto.nombre }}</td>
       <td>{{ producto.descripcion }}</td>
       <td>{{ producto.precio }} €</td>
