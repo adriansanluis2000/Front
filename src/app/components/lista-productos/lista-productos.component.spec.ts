@@ -11,7 +11,7 @@ describe('ListaProductosComponent', () => {
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
 
   beforeEach(async () => {
-    productoServiceMock = jasmine.createSpyObj('ProductoService', ['obtenerProductos', 'eliminarProducto']);
+    productoServiceMock = jasmine.createSpyObj('ProductoService', ['obtenerProductos', 'eliminarProducto', 'actualizarProducto']);
 
     TestBed.configureTestingModule({
       imports: [
@@ -55,7 +55,7 @@ describe('ListaProductosComponent', () => {
     it('Debería mostrar un mensaje de error en la consola', () => {
       spyOn(console, 'error');
       productoServiceMock.obtenerProductos.and.returnValue(throwError({ status: 500 }));
-      component.ngOnInit();
+      fixture.detectChanges();
 
       expect(component.errorMessage).toBe('Error al obtener productos');
     });
@@ -65,7 +65,7 @@ describe('ListaProductosComponent', () => {
     it('debería mostrar un mensaje de error de conexión', () => {
       spyOn(console, 'error');
       productoServiceMock.obtenerProductos.and.returnValue(throwError({ status: 0 }));
-      component.ngOnInit();
+      fixture.detectChanges();
 
       expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
     });
@@ -138,5 +138,95 @@ describe('ListaProductosComponent', () => {
       expect(productoServiceMock.eliminarProducto).toHaveBeenCalledWith(productId);
       expect(console.error).toHaveBeenCalledWith('Error al eliminar producto', 'No internet connection');
     })
+  });
+
+  describe('Modificar producto registrado', () => {
+    let obtenerProductosSpy: jasmine.Spy;
+
+    beforeEach(() => {
+      obtenerProductosSpy = spyOn(component, 'obtenerProductos').and.callFake(() => {
+        console.log('Productos obtenidos correctamente');
+      });
+    });
+    it('debería guardar los cambios correctamente al modificar un producto', () => {
+      const productoOriginal = { id: 1, nombre: 'Producto A', descripcion: 'Desc A', precio: 100, stock: 10 };
+      const productoModificado = { id: 1, nombre: 'Producto A Modificado', descripcion: 'Desc A Modificada', precio: 120, stock: 15 };
+
+      productoServiceMock.actualizarProducto.and.returnValue(of(productoModificado));
+      spyOn(component, 'cerrarModal');
+
+      component.abrirModal(productoOriginal);
+
+      // Simular cambios en el formulario
+      component.productoForm.patchValue({
+        nombre: 'Producto A Modificado',
+        descripcion: 'Desc A Modificada',
+        precio: 120,
+        stock: 15
+      });
+
+      component.guardarProducto();
+
+      expect(productoServiceMock.actualizarProducto).toHaveBeenCalledWith(productoOriginal.id, productoModificado);
+      expect(component.cerrarModal).toHaveBeenCalled();
+      expect(obtenerProductosSpy).toHaveBeenCalled();
+    });
+
+    it('debería mantener los campos sin cambios si no se modifican', () => {
+      const productoOriginal = { id: 1, nombre: 'Producto B', descripcion: 'Desc B', precio: 200, stock: 5 };
+
+      productoServiceMock.actualizarProducto.and.returnValue(of(productoOriginal));
+
+      component.abrirModal(productoOriginal);
+
+      // No se cambia el campo 'descripcion' y 'precio'
+      component.productoForm.patchValue({
+        stock: 10
+      });
+
+      component.guardarProducto();
+
+      expect(productoServiceMock.actualizarProducto).toHaveBeenCalledWith(productoOriginal.id, {
+        ...productoOriginal,
+        stock: 10
+      });
+      expect(obtenerProductosSpy).toHaveBeenCalled();
+    });
+
+    it('debería mostrar un mensaje de error si los datos ingresados no son válidos', () => {
+      const productoOriginal = { id: 1, nombre: 'Producto C', descripcion: 'Desc C', precio: 300, stock: 20 };
+
+      productoServiceMock.actualizarProducto.and.returnValue(of(productoOriginal));
+      spyOn(console, 'log');
+
+      component.abrirModal(productoOriginal);
+
+      // Simular datos no válidos
+      component.productoForm.patchValue({
+        precio: -50
+      });
+
+      component.guardarProducto();
+
+      expect(productoServiceMock.actualizarProducto).not.toHaveBeenCalled();
+      expect(console.log).toHaveBeenCalledWith('Formulario no válido o producto no seleccionado');
+    });
+
+    it('debería descartar las modificaciones si se cancelan los cambios', () => {
+      const productoOriginal = { id: 1, nombre: 'Producto D', descripcion: 'Desc D', precio: 400, stock: 25 };
+
+      component.abrirModal(productoOriginal);
+
+      // Simular cambios en el formulario
+      component.productoForm.patchValue({
+        nombre: 'Producto D Modificado',
+        descripcion: 'Desc D Modificada'
+      });
+
+      // Cancelar los cambios
+      component.cerrarModal();
+
+      expect(component.productoSeleccionado).toBeNull(); // Asegura que el modal se cierra sin guardar
+    });
   });
 });
