@@ -47,7 +47,7 @@ describe('ListaProductosComponent', () => {
 
       const noProductsMessage = fixture.nativeElement.querySelector('.no-products-message');
       expect(noProductsMessage).toBeTruthy();
-      expect(noProductsMessage.textContent).toContain('No hay productos registrados actualmente.');
+      expect(noProductsMessage.textContent).toContain('No se encontraron productos.');
     });
   });
 
@@ -227,6 +227,53 @@ describe('ListaProductosComponent', () => {
       component.cerrarModal();
 
       expect(component.productoSeleccionado).toBeNull(); // Asegura que el modal se cierra sin guardar
+    });
+  });
+
+  describe('Buscar productos por nombre', () => {
+    let productosMock: any[];
+
+    beforeEach(() => {
+      productosMock = [
+        { id: 1, nombre: 'Gafas de Sol', descripcion: 'Descripción 1', precio: 10, stock: 5 },
+        { id: 2, nombre: 'Gafas de Lectura', descripcion: 'Descripción 2', precio: 20, stock: 10 },
+        { id: 3, nombre: 'Lentes de Contacto', descripcion: 'Lentes de contacto', precio: 40, stock: 5 },
+      ];
+
+      productoServiceMock.obtenerProductos.and.returnValue(of(productosMock));
+      fixture.detectChanges();
+    });
+
+    it('Debería mostrar todos los productos al iniciar', () => {
+      expect(component.productos.length).toBe(3);
+      expect(component.productos).toEqual(productosMock);
+    });
+
+    it('debería mostrar productos que coinciden con el nombre buscado', () => {
+      component.busqueda = 'Gafas';
+      component.filtrarProductos();
+      expect(component.productosFiltrados.length).toBe(2);
+    });
+
+    it('debería mostrar mensaje de búsqueda sin resultados', () => {
+      component.busqueda = 'No Existe';
+      component.filtrarProductos();
+      expect(component.productosFiltrados.length).toBe(0);
+      expect(component.errorMessage).toBe('No se encontraron productos.');
+    });
+
+    it('debería mostrar productos con búsqueda parcial', () => {
+      component.busqueda = 'Sol';
+      component.filtrarProductos();
+      expect(component.productosFiltrados.length).toBe(1);
+      expect(component.productosFiltrados[0].nombre).toContain('Sol');
+    });
+
+    it('debería mostrar productos con búsqueda múltiple', () => {
+      component.busqueda = 'Gafas Sol';
+      component.filtrarProductos();
+      expect(component.productosFiltrados.length).toBe(1);
+      expect(component.productosFiltrados[0].nombre).toContain('Gafas');
     });
   });
 });

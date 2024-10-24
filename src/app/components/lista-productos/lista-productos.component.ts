@@ -38,10 +38,17 @@ export class ListaProductosComponent implements OnInit {
   }
 
   filtrarProductos(): void {
-    console.log('Buscando:', this.busqueda);
+    const terminos = this.busqueda.split(' ').map(termino => termino.trim().toLowerCase()).filter(termino => termino !== '');
+
     this.productosFiltrados = this.productos.filter(producto =>
-      producto.nombre.toLowerCase().includes(this.busqueda.toLowerCase())
+      terminos.every(termino => producto.nombre.toLowerCase().includes(termino.toLowerCase()))
     );
+
+    if (this.productosFiltrados.length === 0) {
+      this.errorMessage = 'No se encontraron productos.'
+    } else {
+      this.errorMessage = '';
+    }
   }
 
   obtenerProductos(): void {
