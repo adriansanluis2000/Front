@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,5 +13,9 @@ export class PedidoService {
 
   registrarPedido(datosPedido: { id: string, cantidad: number }[]) {
     return this.http.post(this.apiUrl, { productos: datosPedido });
+  }
+
+  obtenerHistorialPedidos(): Observable<any> {
+    return this.http.get(this.apiUrl);
   }
 }

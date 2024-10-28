@@ -20,5 +20,10 @@ export const routes: Routes = [
         path: 'registrarPedido',
         loadComponent: () =>
             import('./components/registrar-pedido/registrar-pedido.component').then(m => m.RegistrarPedidoComponent)
+    },
+    {
+        path: 'pedidos',
+        loadComponent: () =>
+            import('./components/historial-pedidos/historial-pedidos.component').then(m => m.HistorialPedidosComponent)
     }
 ];
