@@ -1,28 +1,49 @@
 <div class="registrar-pedido">
     <h2>Registrar Pedido</h2>
 
-    <!-- Lista de productos -->
-    <section>
-        <h3>Lista de Productos</h3>
-        <ul>
-            <li *ngFor="let producto of productos" (click)="agregarProducto(producto)">
-                {{ producto.nombre }} - {{ producto.precio }} €
-            </li>
-        </ul>
-    </section>
+    <div class="contenedor">
+        <!-- Lista de productos -->
+        <section class="lista-productos">
+            <h3>Lista de Productos</h3>
+            <ul>
+                <li *ngFor="let producto of productos" (click)="agregarProducto(producto)">
+                    {{ producto.nombre }} - {{ producto.precio }} €
+                </li>
+            </ul>
+        </section>
 
-    <!-- Lista de productos en el pedido -->
-    <section>
-        <h3>Productos en el Pedido</h3>
-        <ul>
-            <li *ngFor="let item of productosPedido">
-                {{ item.producto.nombre }} -
-                <input type="number" [(ngModel)]="item.cantidad" (change)="actualizarProducto(item)" />
-                <button (click)="quitarProducto(item)">Eliminar</button>
-            </li>
-        </ul>
-    </section>
+        <!-- Lista de productos en el pedido -->
+        <section class="formulario-pedido">
+            <h3>Productos en el Pedido</h3>
+            <div class="cabecera-pedido">
+                <span>Producto</span>
+                <span>Precio</span>
+                <span>Cantidad</span>
+                <span>Precio Total</span>
+                <span>Acciones</span>
+            </div>
+            <ul>
+                <li *ngFor="let item of productosPedido" class="productos-pedido">
+                    {{ item.producto.nombre }}
+                    <span>{{ item.producto.precio }} €</span>
+                    <input type="number" [(ngModel)]="item.cantidad" (change)="actualizarProducto(item)" />
+                    <span class="precio-total">{{ item.producto.precio * item.cantidad }} €</span>
+                    <div class="acciones">
+                        <button (click)="quitarProducto(item)" aria-label="Eliminar producto"
+                            class="action-button delete-button">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+            <!-- Botón para registrar el pedido -->
+            <button class="boton-registrar" *ngIf="productosPedido.length > 0" (click)="registrarPedido()">Registrar
+                Pedido</button>
 
-    <!-- Botón para registrar el pedido -->
-    <button (click)="registrarPedido()">Registrar Pedido</button>
+            <!-- Total del pedido -->
+            <div class="total-pedido">
+                <strong>Total del Pedido: {{ calcularTotalPedido() }} €</strong>
+            </div>
+        </section>
+    </div>
 </div>

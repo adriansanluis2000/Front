@@ -1,44 +1,152 @@
 .registrar-pedido {
-
-  h2,
-  h3 {
+  h2 {
     color: #333;
+    margin-bottom: 1rem;
   }
 
-  ul {
-    list-style: none;
-    padding: 0;
+  .contenedor {
+    display: flex;
+    gap: 20px;
+  }
 
-    li {
-      cursor: pointer;
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      display: flex;
-      justify-content: space-between;
+  .lista-productos {
+    flex: 1;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
 
-      input[type="number"] {
-        width: 50px;
-      }
+    h3 {
+      color: #333;
+    }
 
-      button {
-        background-color: red;
-        color: white;
-        border: none;
-        border-radius: 5px;
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
         cursor: pointer;
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: #e2e2e2;
+        }
       }
     }
   }
 
-  button {
-    padding: 0.5rem 1rem;
-    background-color: green;
-    color: white;
-    border: none;
+  .formulario-pedido {
+    flex: 1;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    cursor: pointer;
-    margin-top: 1rem;
+    padding: 10px;
+
+    h3 {
+      color: #333;
+    }
+
+    .cabecera-pedido {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      font-weight: bold;
+      margin: 0.5rem 0;
+      border-bottom: 2px solid #ddd;
+      padding: 0.5rem 0;
+
+      span {
+        text-align: left;
+
+        &:first-child {
+          margin-left: 10px;
+        }
+
+        &:last-child {
+          text-align: right;
+          margin-right: 20px;
+        }
+      }
+
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      .productos-pedido {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+        align-items: center;
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+
+        .precio-total {
+          margin-left: 30px;
+        }
+
+        .acciones {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          margin-right: 30px;
+        }
+
+        input[type="number"] {
+          width: 50px;
+          margin: 0 0.5rem;
+        }
+
+        .action-button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          margin-left: 5px;
+          font-size: 1.2rem;
+          padding: 8px;
+          border-radius: 4px;
+          width: 40px;
+
+          &:hover {
+            opacity: 0.8;
+          }
+        }
+
+        .delete-button {
+          background-color: #dc3545;
+          color: white;
+
+          &:hover {
+            background-color: #c82333;
+          }
+        }
+      }
+    }
+
+    .boton-registrar {
+      padding: 0.5rem 1rem;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    .total-pedido {
+      margin-top: 1rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #333;
+    }
   }
 }
