@@ -18,4 +18,12 @@
             </tr>
         </tbody>
     </table>
+
+    <!-- Modal para mostrar los detalles del pedido -->
+    <div *ngIf="pedidoSeleccionado" class="modal">
+        <div class="modal-content">
+            <span class="close" (click)="cerrarDetalles()">&times;</span>
+            <app-detalles-pedido [pedido]="pedidoSeleccionado"></app-detalles-pedido>
+        </div>
+    </div>
 </div>
