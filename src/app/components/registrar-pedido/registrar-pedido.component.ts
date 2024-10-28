@@ -15,7 +15,7 @@ export class RegistrarPedidoComponent implements OnInit {
   productos: any[] = [];
   productosPedido: { producto: any, cantidad: number }[] = [];
 
-  constructor(private readonly productoService: ProductoService, private readonly pedidoService: PedidoService) {}
+  constructor(private readonly productoService: ProductoService, private readonly pedidoService: PedidoService) { }
 
   ngOnInit(): void {
     this.cargarProductos();
@@ -32,7 +32,7 @@ export class RegistrarPedidoComponent implements OnInit {
     if (productoExistente) {
       productoExistente.cantidad++;
     } else {
-      this.productosPedido.push({ producto, cantidad: 1});
+      this.productosPedido.push({ producto, cantidad: 1 });
     }
   }
 
@@ -51,10 +51,17 @@ export class RegistrarPedidoComponent implements OnInit {
       id: item.producto.id,
       cantidad: item.cantidad
     }));
-    this.pedidoService.registrarPedido(datosPedido).subscribe(response => {
-      console.log('Pedido registrado:', response);
-      this.productosPedido = [];
-    })
+
+    this.pedidoService.registrarPedido(datosPedido).subscribe(
+      response => {
+        console.log('Pedido registrado:', response);
+        this.productosPedido = [];
+      },
+      error => {
+        console.error('Error al registrar el pedido:', error);
+        alert(error.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.');
+      }
+    );
   }
 
 }
