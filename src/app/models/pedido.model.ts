@@ -2,7 +2,6 @@ export interface Pedido {
     id: number;
     fecha: string;
     precioTotal: number;
-    estado: string;
     Productos: Array<{
         id: number;
         nombre: string;

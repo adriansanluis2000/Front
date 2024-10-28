@@ -5,15 +5,13 @@
             <tr>
                 <th>Fecha</th>
                 <th>Total</th>
-                <th>Estado</th>
                 <th>Detalles</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let pedido of pedidos">
-                <td>{{ pedido.fecha }}</td>
+                <td>{{ pedido.fecha | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td>{{ pedido.precioTotal + '€' }}</td>
-                <td>{{ pedido.estado }}</td>
                 <td><button (click)="verDetallesPedido(pedido.id)">Ver Detalles</button></td>
             </tr>
         </tbody>

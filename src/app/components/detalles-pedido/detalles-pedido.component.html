@@ -1,8 +1,7 @@
 <div class="detalles-pedido">
     <h3>Detalles del Pedido #{{ pedido.id }}</h3>
-    <p><strong>Fecha:</strong> {{ pedido.fecha }}</p>
+    <p><strong>Fecha:</strong> {{ pedido.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
     <p><strong>Total:</strong> {{ pedido.precioTotal + '€' }}</p>
-    <p><strong>Estado:</strong> {{ pedido.estado }}</p>
 
     <h4>Productos:</h4>
     <ul>
