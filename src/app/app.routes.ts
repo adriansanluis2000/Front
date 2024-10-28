@@ -8,12 +8,17 @@ export const routes: Routes = [
     },
     {
         path: 'productos',
-        loadComponent: () => 
-            import('./components/lista-productos/lista-productos.component').then(m => m.ListaProductosComponent),    
+        loadComponent: () =>
+            import('./components/lista-productos/lista-productos.component').then(m => m.ListaProductosComponent)
     },
     {
         path: 'agregarProducto',
         loadComponent: () =>
-            import('./components/agregar-producto/agregar-producto.component').then(m =>  m.AgregarProductoComponent),
+            import('./components/agregar-producto/agregar-producto.component').then(m => m.AgregarProductoComponent)
+    },
+    {
+        path: 'registrarPedido',
+        loadComponent: () =>
+            import('./components/registrar-pedido/registrar-pedido.component').then(m => m.RegistrarPedidoComponent)
     }
 ];

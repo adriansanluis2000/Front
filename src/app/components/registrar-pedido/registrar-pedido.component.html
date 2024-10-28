@@ -1,0 +1,28 @@
+<div class="registrar-pedido">
+    <h2>Registrar Pedido</h2>
+
+    <!-- Lista de productos -->
+    <section>
+        <h3>Lista de Productos</h3>
+        <ul>
+            <li *ngFor="let producto of productos" (click)="agregarProducto(producto)">
+                {{ producto.nombre }} - {{ producto.precio }} €
+            </li>
+        </ul>
+    </section>
+
+    <!-- Lista de productos en el pedido -->
+    <section>
+        <h3>Productos en el Pedido</h3>
+        <ul>
+            <li *ngFor="let item of productosPedido">
+                {{ item.producto.nombre }} -
+                <input type="number" [(ngModel)]="item.cantidad" (change)="actualizarProducto(item)" />
+                <button (click)="quitarProducto(item)">Eliminar</button>
+            </li>
+        </ul>
+    </section>
+
+    <!-- Botón para registrar el pedido -->
+    <button (click)="registrarPedido()">Registrar Pedido</button>
+</div>
