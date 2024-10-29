@@ -14,11 +14,19 @@ import { FormsModule } from '@angular/forms';
 export class RegistrarPedidoComponent implements OnInit {
   productos: any[] = [];
   productosPedido: { producto: any, cantidad: number }[] = [];
+  pedidoPendiente: any[] = [];
+
+  errorMessage: string = '';
 
   constructor(private readonly productoService: ProductoService, private readonly pedidoService: PedidoService) { }
 
   ngOnInit(): void {
     this.cargarProductos();
+
+    // Escuchar el evento de reconexión
+    window.addEventListener('online', () => {
+      this.checkAndRetryOrder();
+    });
   }
 
   cargarProductos(): void {
@@ -51,6 +59,13 @@ export class RegistrarPedidoComponent implements OnInit {
   }
 
   actualizarProducto(item: { producto: any, cantidad: number }): void {
+    // Comprobar si la cantidad es un número
+    if (isNaN(item.cantidad) || typeof item.cantidad !== 'number') {
+      alert('La cantidad debe ser un número.');
+      item.cantidad = 1;
+      return;
+    }
+
     if (item.cantidad < 1) {
       const borrado = this.quitarProducto(item);
       if (!borrado) {
@@ -60,6 +75,12 @@ export class RegistrarPedidoComponent implements OnInit {
   }
 
   registrarPedido(): void {
+    if (!navigator.onLine) {
+      this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
+      this.pedidoPendiente = this.productosPedido.map(item => ({ id: item.producto.id, cantidad: item.cantidad }));
+      return;
+    }
+
     const datosPedido = this.productosPedido.map(item => ({
       id: item.producto.id,
       cantidad: item.cantidad
@@ -69,12 +90,28 @@ export class RegistrarPedidoComponent implements OnInit {
       response => {
         console.log('Pedido registrado:', response);
         this.productosPedido = [];
+        this.errorMessage = '';
       },
       error => {
         console.error('Error al registrar el pedido:', error);
         alert(error.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.');
       }
     );
+  }
+
+  checkAndRetryOrder(): void {
+    if (navigator.onLine && this.pedidoPendiente.length > 0) {
+      this.pedidoService.registrarPedido(this.pedidoPendiente).subscribe(
+        response => {
+          console.log('Pedido registrado tras reconexión:', response);
+          this.pedidoPendiente = [];
+        },
+        error => {
+          console.error('Error al reintentar registrar el pedido:', error);
+          this.errorMessage = error.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.';
+        }
+      );
+    }
   }
 
   calcularTotalPedido(): number {

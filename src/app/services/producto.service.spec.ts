@@ -10,8 +10,7 @@ describe('ProductosService', () => {
       imports: [
         HttpClientModule
       ]
-    })
-    .compileComponents();
+    }).compileComponents();
     service = TestBed.inject(ProductoService);
   });
 

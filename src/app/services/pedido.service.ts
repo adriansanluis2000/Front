@@ -11,7 +11,7 @@ export class PedidoService {
 
   constructor(private readonly http: HttpClient) { }
 
-  registrarPedido(datosPedido: { id: string, cantidad: number }[]) {
+  registrarPedido(datosPedido: { id: number, cantidad: number }[]) {
     return this.http.post(this.apiUrl, { productos: datosPedido });
   }
 
