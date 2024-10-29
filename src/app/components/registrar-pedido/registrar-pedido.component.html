@@ -15,6 +15,15 @@
         <!-- Lista de productos en el pedido -->
         <section class="formulario-pedido">
             <h3>Productos en el Pedido</h3>
+
+            <!-- Contenedor para el botón eliminar todos -->
+            <div class="eliminar-todos-container">
+                <button class="boton-eliminar-todos" *ngIf="productosPedido.length > 0"
+                    (click)="eliminarTodosLosProductos()">
+                    Eliminar Todos
+                </button>
+            </div>
+
             <div class="cabecera-pedido">
                 <span>Producto</span>
                 <span>Precio</span>
@@ -39,9 +48,11 @@
             <div *ngIf="productosPedido.length === 0" class="no-products-message">
                 <p>Añade productos al pedido para continuar.</p>
             </div>
+
             <!-- Botón para registrar el pedido -->
-            <button class="boton-registrar" *ngIf="productosPedido.length > 0" (click)="registrarPedido()">Registrar
-                Pedido</button>
+            <button class="boton-registrar" *ngIf="productosPedido.length > 0" (click)="registrarPedido()">
+                Registrar Pedido
+            </button>
 
             <!-- Total del pedido -->
             <div class="total-pedido">

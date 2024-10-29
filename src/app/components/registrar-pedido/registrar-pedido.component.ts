@@ -134,4 +134,11 @@ export class RegistrarPedidoComponent implements OnInit {
     }, 0);
   }
 
+  eliminarTodosLosProductos(): void {
+    const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar TODOS los productos?');
+    if (confirmacion) {
+      this.productosPedido = [];
+    }
+  }
+
 }

@@ -153,6 +153,23 @@
       text-align: center;
     }
 
+    .eliminar-todos-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1rem;
+    }
+
+    .boton-eliminar-todos {
+      background-color: $color-danger;
+      margin: 0;
+      display: inline-block;
+      text-align: center;
+
+      &:hover {
+        background-color: darken($color-danger, 10%);
+      }
+    }
+
     .total-pedido {
       margin-top: auto;
       font-weight: bold;
