@@ -1,6 +1,12 @@
+@import '@variables';
+
 .registrar-pedido {
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
   h2 {
-    color: #333;
+    color: $color-primary;
     margin-bottom: 1rem;
   }
 
@@ -17,9 +23,11 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 
     h3 {
-      color: #333;
+      color: $color-primary;
+      margin-bottom: 1rem;
     }
 
     ul {
@@ -49,9 +57,11 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 
     h3 {
-      color: #333;
+      color: $color-primary;
+      margin-bottom: 1rem;
     }
 
     .cabecera-pedido {
@@ -74,7 +84,6 @@
           margin-right: 20px;
         }
       }
-
     }
 
     ul {
@@ -89,6 +98,12 @@
         padding: 0.5rem;
         border: 1px solid #ccc;
         border-radius: 5px;
+        background-color: lighten($beige, 5%);
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: lighten($beige, 15%);
+        }
 
         .precio-total {
           margin-left: 30px;
@@ -104,49 +119,33 @@
         input[type="number"] {
           width: 50px;
           margin: 0 0.5rem;
-        }
-
-        .action-button {
-          background: none;
-          border: none;
-          cursor: pointer;
-          margin-left: 5px;
-          font-size: 1.2rem;
-          padding: 8px;
-          border-radius: 4px;
-          width: 40px;
-
-          &:hover {
-            opacity: 0.8;
-          }
-        }
-
-        .delete-button {
-          background-color: #dc3545;
-          color: white;
-
-          &:hover {
-            background-color: #c82333;
-          }
+          border: 1px solid $color-primary;
+          border-radius: 5px;
+          padding: 0.2rem;
         }
       }
     }
 
     .boton-registrar {
       padding: 0.5rem 1rem;
-      background-color: green;
-      color: white;
+      background-color: $color-success;
+      color: $color-text;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       margin-top: 1rem;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: darken($color-success, 10%);
+      }
     }
 
     .total-pedido {
       margin-top: 1rem;
       font-weight: bold;
       font-size: 1.2rem;
-      color: #333;
+      color: $color-primary;
     }
   }
 }

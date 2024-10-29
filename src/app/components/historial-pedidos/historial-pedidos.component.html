@@ -21,7 +21,22 @@
     <div *ngIf="pedidoSeleccionado" class="modal">
         <div class="modal-content">
             <span class="close" (click)="cerrarDetalles()">&times;</span>
-            <app-detalles-pedido [pedido]="pedidoSeleccionado"></app-detalles-pedido>
+
+            <!-- Contenido de los detalles del pedido directamente en el modal -->
+            <div class="detalles-pedido">
+                <h3>Detalles del Pedido #{{ pedidoSeleccionado.id }}</h3>
+                <p><strong>Fecha:</strong> {{ pedidoSeleccionado.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+                <p><strong>Total:</strong> {{ pedidoSeleccionado.precioTotal + '€' }}</p>
+
+                <h4>Productos:</h4>
+                <ul>
+                    <li *ngFor="let producto of pedidoSeleccionado.Productos" class="producto-item">
+                        <span class="producto-nombre">{{ producto.nombre }}</span>
+                        <span class="producto-precio">{{ producto.precio + '€' }}</span>
+                        <span class="producto-cantidad">Cantidad: {{ producto.PedidoProducto.cantidad }}</span>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

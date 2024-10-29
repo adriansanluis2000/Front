@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { ProductoService } from '../../services/producto.service';
 import { PedidoService } from '../../services/pedido.service';
-import { NgFor, NgIf } from '@angular/common';
+import { isPlatformBrowser, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -18,15 +18,21 @@ export class RegistrarPedidoComponent implements OnInit {
 
   errorMessage: string = '';
 
-  constructor(private readonly productoService: ProductoService, private readonly pedidoService: PedidoService) { }
+  constructor(
+    private readonly productoService: ProductoService,
+    private readonly pedidoService: PedidoService,
+    @Inject(PLATFORM_ID) private readonly platformId: Object
+  ) { }
 
   ngOnInit(): void {
     this.cargarProductos();
 
-    // Escuchar el evento de reconexión
-    window.addEventListener('online', () => {
-      this.checkAndRetryOrder();
-    });
+    if (isPlatformBrowser(this.platformId)) {
+      // Escuchar el evento de reconexión
+      window.addEventListener('online', () => {
+        this.checkAndRetryOrder();
+      });
+    }
   }
 
   cargarProductos(): void {

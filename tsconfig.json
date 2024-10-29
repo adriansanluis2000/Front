@@ -21,7 +21,13 @@
     "lib": [
       "ES2022",
       "dom"
-    ]
+    ],
+    "baseUrl": "./src/app/styles",
+    "paths": {
+      "@variables": ["_variables.scss"],
+      "@global": ["_global.scss"],
+      "@buttons": ["_buttons.scss"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

@@ -52,11 +52,11 @@
 </table>
 
 <!-- Modal para editar producto -->
-<dialog *ngIf="productoSeleccionado" class="modal" tabindex="-1" style="display: block;">
+<div *ngIf="productoSeleccionado" class="modal">
   <div class="modal-content">
     <div class="modal-header">
       <h5 class="modal-title">Editar Producto</h5>
-      <button type="button" class="close" (click)="cerrarModal()">×</button>
+      <span class="close" (click)="cerrarModal()">&times;</span>
     </div>
     <div class="modal-body">
       <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()">
@@ -76,8 +76,8 @@
           <label for="stock">Stock</label>
           <input id="stock" class="form-control" type="number" formControlName="stock" />
         </div>
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="submit" class="btn-save">Guardar</button>
       </form>
     </div>
   </div>
-</dialog>
+</div>

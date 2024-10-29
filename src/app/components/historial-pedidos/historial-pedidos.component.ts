@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { PedidoService } from '../../services/pedido.service';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { Pedido } from '../../models/pedido.model';
-import { DetallesPedidoComponent } from '../detalles-pedido/detalles-pedido.component';
 
 @Component({
   selector: 'app-historial-pedidos',
   standalone: true,
-  imports: [NgFor, NgIf, DetallesPedidoComponent, DatePipe],
+  imports: [NgFor, NgIf, DatePipe],
   templateUrl: './historial-pedidos.component.html',
   styleUrl: './historial-pedidos.component.scss'
 })
