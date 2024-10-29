@@ -36,6 +36,9 @@
                     </div>
                 </li>
             </ul>
+            <div *ngIf="productosPedido.length === 0" class="no-products-message">
+                <p>Añade productos al pedido para continuar.</p>
+            </div>
             <!-- Botón para registrar el pedido -->
             <button class="boton-registrar" *ngIf="productosPedido.length > 0" (click)="registrarPedido()">Registrar
                 Pedido</button>

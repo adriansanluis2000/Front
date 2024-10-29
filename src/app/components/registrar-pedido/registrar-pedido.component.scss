@@ -25,11 +25,6 @@
     padding: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 
-    h3 {
-      color: $color-primary;
-      margin-bottom: 1rem;
-    }
-
     ul {
       list-style: none;
       padding: 0;
@@ -37,32 +32,57 @@
       li {
         cursor: pointer;
         margin: 0.5rem 0;
-        padding: 0.5rem;
+        padding: 1rem 1rem 1rem 2rem;
         border: 1px solid #ccc;
         border-radius: 5px;
         display: flex;
         justify-content: space-between;
-        transition: background-color 0.3s;
+        align-items: center;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        position: relative;
 
         &:hover {
           background-color: #e2e2e2;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .nombre-producto {
+          flex: 1;
+          font-weight: bold;
+          color: $color-text;
+        }
+
+        .precio {
+          margin-left: 20px;
+          color: $color-secondary;
+          font-weight: bold;
+        }
+
+        // Pseudo-elemento para añadir un icono o marcador
+        &:before {
+          content: "";
+          position: absolute;
+          left: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 10px;
+          height: 10px;
+          background-color: $color-primary;
+          border-radius: 50%;
         }
       }
     }
   }
 
   .formulario-pedido {
-    flex: 1;
+    flex: 2;
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-
-    h3 {
-      color: $color-primary;
-      margin-bottom: 1rem;
-    }
+    display: flex;
+    flex-direction: column;
 
     .cabecera-pedido {
       display: grid;
@@ -127,25 +147,18 @@
     }
 
     .boton-registrar {
-      padding: 0.5rem 1rem;
-      background-color: $color-success;
-      color: $color-text;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 1rem;
-      transition: background-color 0.3s;
-
-      &:hover {
-        background-color: darken($color-success, 10%);
-      }
+      margin: 1rem auto;
+      display: block;
+      max-width: 200px;
+      text-align: center;
     }
 
     .total-pedido {
-      margin-top: 1rem;
+      margin-top: auto;
       font-weight: bold;
       font-size: 1.2rem;
       color: $color-primary;
+      text-align: right;
     }
   }
 }

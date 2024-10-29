@@ -1,16 +1,16 @@
 @import '@variables';
 
 button {
-  background-color: $rojo;
-  color: white;
+  background-color: $color-success;
+  color: $color-text;
   border: none;
-  padding: 6px 12px;
+  padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: $rojo-oscuro;
+    background-color: darken($color-success, 10%);
   }
 
   &:focus {
