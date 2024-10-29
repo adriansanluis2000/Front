@@ -26,7 +26,7 @@
                 <li *ngFor="let item of productosPedido" class="productos-pedido">
                     {{ item.producto.nombre }}
                     <span>{{ item.producto.precio }} €</span>
-                    <input type="number" [(ngModel)]="item.cantidad" (change)="actualizarProducto(item)" />
+                    <input type="number" [(ngModel)]="item.cantidad" (change)="actualizarProducto(item)" min="0" />
                     <span class="precio-total">{{ item.producto.precio * item.cantidad }} €</span>
                     <div class="acciones">
                         <button (click)="quitarProducto(item)" aria-label="Eliminar producto"

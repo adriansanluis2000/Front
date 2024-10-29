@@ -41,13 +41,21 @@ export class RegistrarPedidoComponent implements OnInit {
     }
   }
 
-  quitarProducto(item: { producto: any, cantidad: number }): void {
-    this.productosPedido = this.productosPedido.filter(orderItem => orderItem !== item);
+  quitarProducto(item: { producto: any, cantidad: number }): boolean {
+    const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar este producto?');
+    if (confirmacion) {
+      this.productosPedido = this.productosPedido.filter(orderItem => orderItem !== item);
+      return true;
+    }
+    return false;
   }
 
   actualizarProducto(item: { producto: any, cantidad: number }): void {
     if (item.cantidad < 1) {
-      this.quitarProducto(item);
+      const borrado = this.quitarProducto(item);
+      if (!borrado) {
+        item.cantidad = 1;
+      }
     }
   }
 
