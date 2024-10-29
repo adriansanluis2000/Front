@@ -141,4 +141,43 @@ describe('RegistrarPedidoComponent', () => {
       expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith([{ id: 1, cantidad: 1 }]);
     });
   });
+
+
+  describe('Pruebas de eliminación de productos del pedido', () => {
+    describe('Prueba de Éxito: Eliminar Producto de Pedido en Recepción', () => {
+      it('debería eliminar un producto del pedido y actualizar el listado de productos', () => {
+        const productoMock = { id: 1, nombre: 'Producto 1', precio: 10 };
+        component.productosPedido.push({ producto: productoMock, cantidad: 1 });
+
+        spyOn(window, 'confirm').and.returnValue(true);
+        const resultado = component.quitarProducto({ producto: productoMock, cantidad: 1 });
+
+        expect(resultado).toBe(true);
+        expect(component.productosPedido.length).toBe(0); // Debería estar vacío después de la eliminación
+      });
+
+      it('debería mostrar un mensaje de confirmación antes de eliminar un producto', () => {
+        const onlineSpy = spyOn(window, 'confirm').and.returnValue(true);
+        const productoMock = { id: 1, nombre: 'Producto 1', precio: 10 };
+        component.productosPedido.push({ producto: productoMock, cantidad: 1 });
+
+        component.quitarProducto({ producto: productoMock, cantidad: 1 });
+
+        expect(onlineSpy).toHaveBeenCalledWith('¿Estás seguro de que deseas eliminar este producto?');
+      });
+    });
+
+    describe('Prueba de Error por Cancelación de la Confirmación de Eliminación', () => {
+      it('debería mantener el producto en el pedido si el usuario cancela la eliminación', () => {
+        const productoMock = { id: 1, nombre: 'Producto 1', precio: 10 };
+        component.productosPedido.push({ producto: productoMock, cantidad: 1 });
+
+        spyOn(window, 'confirm').and.returnValue(false); // Simula la cancelación del usuario
+        const resultado = component.quitarProducto({ producto: productoMock, cantidad: 1 });
+
+        expect(resultado).toBe(false);
+        expect(component.productosPedido.length).toBe(1); // El producto debe permanecer en el pedido
+      });
+    });
+  });
 });

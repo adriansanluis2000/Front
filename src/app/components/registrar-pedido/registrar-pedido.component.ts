@@ -75,6 +75,7 @@ export class RegistrarPedidoComponent implements OnInit {
   }
 
   registrarPedido(): void {
+    // Verificar si hay conexión a internet
     if (!navigator.onLine) {
       this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
       this.pedidoPendiente = this.productosPedido.map(item => ({ id: item.producto.id, cantidad: item.cantidad }));
