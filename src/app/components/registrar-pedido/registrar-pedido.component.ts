@@ -66,6 +66,13 @@ export class RegistrarPedidoComponent implements OnInit {
       return;
     }
 
+    // Comprobar si la cantidad es un número decimal
+    if (item.cantidad % 1 !== 0) {
+      alert('La cantidad debe ser un número entero.'); // Mensaje de error para decimales
+      item.cantidad = Math.floor(item.cantidad); // Redondear hacia abajo o puedes usar Math.round(item.cantidad)
+      return;
+    }
+
     if (item.cantidad < 1) {
       const borrado = this.quitarProducto(item);
       if (!borrado) {

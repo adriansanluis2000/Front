@@ -53,33 +53,6 @@ describe('RegistrarPedidoComponent', () => {
     });
   });
 
-  describe('Prueba de Error por Cantidad Negativa', () => {
-    it('debería no permitir agregar un producto con cantidad negativa', () => {
-      const productoMock = { id: 1, nombre: 'Producto 1' };
-      component.agregarProducto(productoMock);
-      component.productosPedido[0].cantidad = -3;
-
-      spyOn(window, 'confirm').and.returnValue(false);
-      component.actualizarProducto(component.productosPedido[0]);
-
-      expect(component.productosPedido[0].cantidad).toBe(1);
-    });
-  });
-
-  describe('Prueba de Error por Cantidad No Numérica', () => {
-    it('debería mostrar un mensaje de error y restablecer la cantidad a 1 si se introduce un valor no numérico', () => {
-      const producto = { id: 1, nombre: 'Producto Test', precio: 10 };
-      const item = { producto, cantidad: NaN };
-
-      spyOn(window, 'alert');
-
-      component.actualizarProducto(item);
-
-      expect(window.alert).toHaveBeenCalledWith('La cantidad debe ser un número.');
-      expect(item.cantidad).toBe(1);
-    });
-  });
-
   describe('Prueba de Error por Fallo de Conexión a Internet', () => {
     it('debería notificar la falta de conexión y no registrar el pedido', () => {
       // Simulamos que no hay conexión
@@ -177,6 +150,65 @@ describe('RegistrarPedidoComponent', () => {
 
         expect(resultado).toBe(false);
         expect(component.productosPedido.length).toBe(1); // El producto debe permanecer en el pedido
+      });
+    });
+  });
+
+
+  describe('Pruebas de Editar Cantidad de Producto en Recepción', () => {
+    describe('Prueba de Éxito: Editar Cantidad de Producto en el Pedido', () => {
+      it('debería actualizar la cantidad del producto en el pedido con éxito y actualizar el precioTotal', () => {
+        const productoMock = { id: 1, nombre: 'Producto 1', precio: 10 };
+        const item = { producto: productoMock, cantidad: 1 };
+        component.productosPedido.push(item);
+
+        component.actualizarProducto({ ...item, cantidad: 3 });
+
+        expect(component.productosPedido[0].cantidad).toBe(3);
+        expect(component.calcularTotalPedido()).toBe(30);
+      });
+    });
+
+    describe('Prueba de Error por Cantidad Negativa', () => {
+      it('debería no permitir agregar un producto con cantidad negativa', () => {
+        const productoMock = { id: 1, nombre: 'Producto 1' };
+        component.agregarProducto(productoMock);
+        component.productosPedido[0].cantidad = -3;
+
+        spyOn(window, 'confirm').and.returnValue(false);
+        component.actualizarProducto(component.productosPedido[0]);
+
+        expect(component.productosPedido[0].cantidad).toBe(1);
+      });
+    });
+
+    describe('Prueba de Error por Cantidad No Numérica', () => {
+      it('debería mostrar un mensaje de error y restablecer la cantidad a 1 si se introduce un valor no numérico', () => {
+        const producto = { id: 1, nombre: 'Producto Test', precio: 10 };
+        const item = { producto, cantidad: NaN };
+
+        spyOn(window, 'alert');
+
+        component.actualizarProducto(item);
+
+        expect(window.alert).toHaveBeenCalledWith('La cantidad debe ser un número.');
+        expect(item.cantidad).toBe(1);
+      });
+    });
+
+    describe('Prueba de Error por Cantidad con Decimales', () => {
+      it('debería redondear la cantidad a un entero o mostrar un mensaje de error', () => {
+        const producto = { id: 1, nombre: 'Producto Test', precio: 10 };
+        const item = { producto, cantidad: 1 };
+        component.productosPedido.push(item);
+
+        spyOn(window, 'alert');
+
+        component.actualizarProducto({ ...item, cantidad: 1.5 });
+
+        expect(window.alert).toHaveBeenCalledWith('La cantidad debe ser un número entero.');
+        expect(item.cantidad).toBe(1);
+        expect(component.calcularTotalPedido()).toBe(10);
       });
     });
   });
