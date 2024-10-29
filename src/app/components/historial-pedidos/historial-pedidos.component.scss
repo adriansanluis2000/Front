@@ -1,12 +1,12 @@
 @import '@variables';
 
 .historial-pedidos {
-  background-color: $color-secondary;
+  border-radius: 5px;
   padding: 20px;
-  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
   h2 {
-    color: $marron;
+    color: $color-primary;
   }
 
   table {
@@ -15,7 +15,7 @@
 
     th,
     td {
-      border: 1px solid $marron;
+      border: 1px solid $color-primary;
       padding: 8px;
     }
 
@@ -35,7 +35,7 @@
     .modal-content {
       h3 {
         margin-top: 0;
-        color: $marron;
+        color: $color-primary;
       }
 
       p,
@@ -53,15 +53,10 @@
           align-items: center;
           justify-content: space-between;
           padding: 8px 0;
-          border-bottom: 1px solid $marron;
+          border-bottom: 1px solid $color-primary;
 
           .producto-nombre {
             font-weight: bold;
-          }
-
-          .producto-precio,
-          .producto-cantidad {
-            color: $marron;
           }
         }
       }

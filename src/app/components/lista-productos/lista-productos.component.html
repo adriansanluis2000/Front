@@ -1,83 +1,85 @@
-<h2>Listado de Productos</h2>
+<div class="lista-productos">
+  <h2>Listado de Productos</h2>
 
-<div class="search-container">
-  <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrarProductos()" placeholder="Buscar producto..."
-    class="search-input" />
-</div>
+  <div class="search-container">
+    <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrarProductos()" placeholder="Buscar producto..."
+      class="search-input" />
+  </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>
-        Nombre
-        <button (click)="ordenarPorNombre()" aria-label="Ordenar por nombre" class="sort-button">
-          <i [class]="ordenAscendente ? 'fas fa-sort-alpha-down' : 'fas fa-sort-alpha-up'"></i>
-        </button>
-      </th>
-      <th>Descripción</th>
-      <th>Precio</th>
-      <th>
-        Stock
-        <button (click)="ordenarPorStock()" aria-label="Ordenar por stock" class="sort-button">
-          <i [class]="ordenAscendente ? 'fas fa-sort-numeric-down' : 'fas fa-sort-numeric-up'"></i>
-        </button>
-      </th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
+  <table>
+    <thead>
+      <tr>
+        <th>
+          Nombre
+          <button (click)="ordenarPorNombre()" aria-label="Ordenar por nombre" class="sort-button">
+            <i [class]="ordenAscendente ? 'fas fa-sort-alpha-down' : 'fas fa-sort-alpha-up'"></i>
+          </button>
+        </th>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>
+          Stock
+          <button (click)="ordenarPorStock()" aria-label="Ordenar por stock" class="sort-button">
+            <i [class]="ordenAscendente ? 'fas fa-sort-numeric-down' : 'fas fa-sort-numeric-up'"></i>
+          </button>
+        </th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
 
-  <tbody>
-    <!-- Mostrar mensaje si no hay productos -->
-    <tr *ngIf="productos.length === 0">
-      <td colspan="5" class="no-products-message">
-        <p>No se encontraron productos.</p>
-      </td>
-    </tr>
-    <tr *ngFor="let producto of productos">
-      <td>{{ producto.nombre }}</td>
-      <td>{{ producto.descripcion }}</td>
-      <td>{{ producto.precio }} €</td>
-      <td>{{ producto.stock }}</td>
-      <td>
-        <button (click)="eliminarProducto(producto.id)" aria-label="Eliminar producto"
-          class="action-button delete-button">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-        <button (click)="abrirModal(producto)" aria-label="Editar producto" class="action-button edit-button">
-          <i class="fas fa-edit"></i>
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+    <tbody>
+      <!-- Mostrar mensaje si no hay productos -->
+      <tr *ngIf="productos.length === 0">
+        <td colspan="5" class="no-products-message">
+          <p>No se encontraron productos.</p>
+        </td>
+      </tr>
+      <tr *ngFor="let producto of productos">
+        <td>{{ producto.nombre }}</td>
+        <td>{{ producto.descripcion }}</td>
+        <td>{{ producto.precio }} €</td>
+        <td>{{ producto.stock }}</td>
+        <td>
+          <button (click)="eliminarProducto(producto.id)" aria-label="Eliminar producto"
+            class="action-button delete-button">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+          <button (click)="abrirModal(producto)" aria-label="Editar producto" class="action-button edit-button">
+            <i class="fas fa-edit"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-<!-- Modal para editar producto -->
-<div *ngIf="productoSeleccionado" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Editar Producto</h5>
-      <span class="close" (click)="cerrarModal()">&times;</span>
-    </div>
-    <div class="modal-body">
-      <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()">
-        <div class="form-group">
-          <label for="nombre">Nombre</label>
-          <input id="nombre" class="form-control" formControlName="nombre" />
-        </div>
-        <div class="form-group">
-          <label for="descripcion">Descripción</label>
-          <textarea id="descripcion" class="form-control" formControlName="descripcion"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="precio">Precio</label>
-          <input id="precio" class="form-control" type="number" formControlName="precio" />
-        </div>
-        <div class="form-group">
-          <label for="stock">Stock</label>
-          <input id="stock" class="form-control" type="number" formControlName="stock" />
-        </div>
-        <button type="submit" class="btn-save">Guardar</button>
-      </form>
+  <!-- Modal para editar producto -->
+  <div *ngIf="productoSeleccionado" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Producto</h5>
+        <span class="close" (click)="cerrarModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" class="form-control" formControlName="nombre" />
+          </div>
+          <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" class="form-control" formControlName="descripcion"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="precio">Precio</label>
+            <input id="precio" class="form-control" type="number" formControlName="precio" />
+          </div>
+          <div class="form-group">
+            <label for="stock">Stock</label>
+            <input id="stock" class="form-control" type="number" formControlName="stock" />
+          </div>
+          <button type="submit" class="btn-save">Guardar</button>
+        </form>
+      </div>
     </div>
   </div>
 </div>

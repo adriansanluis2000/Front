@@ -118,11 +118,11 @@
         padding: 0.5rem;
         border: 1px solid #ccc;
         border-radius: 5px;
-        background-color: lighten($beige, 5%);
+        background-color: lighten($color-secondary, 5%);
         transition: background-color 0.3s;
 
         &:hover {
-          background-color: lighten($beige, 15%);
+          background-color: lighten($color-secondary, 15%);
         }
 
         .precio-total {
