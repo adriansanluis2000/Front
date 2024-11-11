@@ -3,6 +3,7 @@
     <table>
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Fecha</th>
                 <th>Total</th>
                 <th>Detalles</th>
@@ -10,6 +11,7 @@
         </thead>
         <tbody>
             <tr *ngFor="let pedido of pedidos">
+                <td>{{ pedido.id }}</td>
                 <td>{{ pedido.fecha | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td>{{ pedido.precioTotal + '€' }}</td>
                 <td><button (click)="verDetallesPedido(pedido.id)">Ver Detalles</button></td>
