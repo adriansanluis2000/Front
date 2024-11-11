@@ -1,4 +1,6 @@
-@import '@modal', '@buttons', '@messages';
+@import './app/styles/buttons';
+@import './app/styles/messages';
+@import './app/styles/modal';
 
 * {
   margin: 0;
