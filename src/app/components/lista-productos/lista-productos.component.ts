@@ -12,6 +12,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 })
 export class ListaProductosComponent implements OnInit {
   productos: any[] = [];
+  productosOriginales: any[] = [];
   productoSeleccionado: any;
   productoForm: FormGroup;
   ordenAscendente: boolean = true;
@@ -33,17 +34,28 @@ export class ListaProductosComponent implements OnInit {
 
   ngOnInit(): void {
     this.obtenerProductos();
+    this.productosOriginales = [...this.productos];
   }
 
   filtrarProductos(): void {
-    const terminos = this.busqueda.split(' ').map(termino => termino.trim().toLowerCase()).filter(termino => termino !== '');
+    const terminos = this.busqueda
+      .split(' ')
+      .map(termino => termino.trim().toLowerCase())
+      .filter(termino => termino !== '');
 
-    this.productos = this.productos.filter(producto =>
-      terminos.every(termino => producto.nombre.toLowerCase().includes(termino.toLowerCase()))
-    );
+    // Restauramos la lista de productos a la lista original antes de filtrar
+    this.productos = [...this.productosOriginales];
 
+    // Filtramos solo si hay términos de búsqueda
+    if (terminos.length > 0) {
+      this.productos = this.productos.filter(producto =>
+        terminos.every(termino => producto.nombre.toLowerCase().includes(termino))
+      );
+    }
+
+    // Mostramos el mensaje de error si no hay productos encontrados
     if (this.productos.length === 0) {
-      this.errorMessage = 'No se encontraron productos.'
+      this.errorMessage = 'No se encontraron productos.';
     } else {
       this.errorMessage = '';
     }
