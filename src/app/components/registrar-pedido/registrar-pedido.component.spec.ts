@@ -122,21 +122,9 @@ describe('RegistrarPedidoComponent', () => {
         const productoMock = { id: 1, nombre: 'Producto 1', precio: 10 };
         component.productosPedido.push({ producto: productoMock, cantidad: 1 });
 
-        spyOn(window, 'confirm').and.returnValue(true);
-        const resultado = component.quitarProducto({ producto: productoMock, cantidad: 1 });
-
-        expect(resultado).toBe(true);
-        expect(component.productosPedido.length).toBe(0); // Debería estar vacío después de la eliminación
-      });
-
-      it('debería mostrar un mensaje de confirmación antes de eliminar un producto', () => {
-        const onlineSpy = spyOn(window, 'confirm').and.returnValue(true);
-        const productoMock = { id: 1, nombre: 'Producto 1', precio: 10 };
-        component.productosPedido.push({ producto: productoMock, cantidad: 1 });
-
         component.quitarProducto({ producto: productoMock, cantidad: 1 });
 
-        expect(onlineSpy).toHaveBeenCalledWith('¿Estás seguro de que deseas eliminar este producto?');
+        expect(component.productosPedido.length).toBe(0); // Debería estar vacío después de la eliminación
       });
     });
 
@@ -145,10 +133,8 @@ describe('RegistrarPedidoComponent', () => {
         const productoMock = { id: 1, nombre: 'Producto 1', precio: 10 };
         component.productosPedido.push({ producto: productoMock, cantidad: 1 });
 
-        spyOn(window, 'confirm').and.returnValue(false); // Simula la cancelación del usuario
-        const resultado = component.quitarProducto({ producto: productoMock, cantidad: 1 });
+        component.quitarProducto({ producto: productoMock, cantidad: 1 });
 
-        expect(resultado).toBe(false);
         expect(component.productosPedido.length).toBe(1); // El producto debe permanecer en el pedido
       });
     });

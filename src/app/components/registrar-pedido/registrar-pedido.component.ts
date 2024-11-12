@@ -55,13 +55,8 @@ export class RegistrarPedidoComponent implements OnInit {
     }
   }
 
-  quitarProducto(item: { producto: any, cantidad: number }): boolean {
-    const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar este producto?');
-    if (confirmacion) {
-      this.productosPedido = this.productosPedido.filter(orderItem => orderItem !== item);
-      return true;
-    }
-    return false;
+  quitarProducto(item: { producto: any, cantidad: number }): void {
+    this.productosPedido = this.productosPedido.filter(orderItem => orderItem !== item);
   }
 
   actualizarProducto(item: { producto: any, cantidad: number }): void {
@@ -80,8 +75,10 @@ export class RegistrarPedidoComponent implements OnInit {
     }
 
     if (item.cantidad < 1) {
-      const borrado = this.quitarProducto(item);
-      if (!borrado) {
+      const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar este producto?');
+      if (confirmacion) {
+        this.quitarProducto(item);
+      } else {
         item.cantidad = 1;
       }
     }
