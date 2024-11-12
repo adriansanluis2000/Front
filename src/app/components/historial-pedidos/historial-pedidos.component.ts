@@ -16,23 +16,33 @@ export class HistorialPedidosComponent implements OnInit {
 
   errorMessage: string = '';
 
-  constructor(private readonly pedidoService: PedidoService) {}
+  constructor(private readonly pedidoService: PedidoService) { }
 
   ngOnInit(): void {
     this.obtenerHistorial();
   }
 
   obtenerHistorial(): void {
+    // Verificar si hay conexión a internet
+    if (!navigator.onLine) {
+      this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
+      return; // No continuamos con la llamada al servicio si no hay conexión
+    }
+
     this.pedidoService.obtenerHistorialPedidos().subscribe({
       next: (data: Pedido[]) => {
-        this.pedidos = data;
+        if (data.length === 0) {
+          this.errorMessage = 'No se encontraron pedidos.';
+        } else {
+          this.errorMessage = '';
+          // Ordenar los pedidos de más reciente a más antiguo
+          this.pedidos = data.sort((a, b) => {
+            return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+          });
+        }
       },
       error: (e) => {
-        if (e.status === 0) {
-          this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
-        } else {
-          this.errorMessage = 'Error al obtener el historial de pedidos'
-        }
+        this.errorMessage = 'Error al obtener el historial de pedidos. Por favor, inténtalo de nuevo más tarde.'
       }
     });
   }

@@ -11,7 +11,7 @@ describe('RegistrarPedidoComponent', () => {
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
 
   beforeEach(async () => {
-    pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['registrarPedido', 'quitarProducto']);
+    pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['registrarPedido']);
     productoServiceMock = jasmine.createSpyObj('ProductoService', ['obtenerProductos']);
 
     await TestBed.configureTestingModule({

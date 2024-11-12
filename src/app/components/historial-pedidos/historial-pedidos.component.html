@@ -1,6 +1,11 @@
 <div class="historial-pedidos">
     <h2>Historial de Pedidos</h2>
-    <table>
+
+    <div *ngIf="errorMessage" class="error-message">
+        <p>{{ errorMessage }}</p>
+    </div>
+
+    <table *ngIf="!errorMessage">
         <thead>
             <tr>
                 <th>ID</th>
