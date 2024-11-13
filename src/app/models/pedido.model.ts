@@ -7,7 +7,7 @@ export interface Pedido {
         nombre: string;
         precio: number;
         stock: number;
-        descripcion: string;
+        descripcion?: string;
         PedidoProducto: {
             cantidad: number;
         }

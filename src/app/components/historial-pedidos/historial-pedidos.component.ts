@@ -23,10 +23,9 @@ export class HistorialPedidosComponent implements OnInit {
   }
 
   obtenerHistorial(): void {
-    // Verificar si hay conexión a internet
     if (!navigator.onLine) {
       this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
-      return; // No continuamos con la llamada al servicio si no hay conexión
+      return;
     }
 
     this.pedidoService.obtenerHistorialPedidos().subscribe({
@@ -41,7 +40,7 @@ export class HistorialPedidosComponent implements OnInit {
           });
         }
       },
-      error: (e) => {
+      error: () => {
         this.errorMessage = 'Error al obtener el historial de pedidos. Por favor, inténtalo de nuevo más tarde.'
       }
     });
@@ -53,5 +52,25 @@ export class HistorialPedidosComponent implements OnInit {
 
   cerrarDetalles(): void {
     this.pedidoSeleccionado = null;
+  }
+
+  eliminarPedido(id: number): void {
+    const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar este pedido?');
+    if (confirmacion) {
+      if (!navigator.onLine) {
+        this.errorMessage = 'No se pudo eliminar el pedido debido a una pérdida de conexión. Verifica tu conexión e inténtalo de nuevo.';
+        return;
+      }
+      this.pedidoService.eliminarPedido(id).subscribe({
+        next: () => {
+          this.pedidos = this.pedidos.filter(pedido => pedido.id !== id);
+          this.errorMessage = '';
+        },
+        error: (error) => {
+          console.error('Error al eliminar pedido', error);
+          this.errorMessage = 'Error al eliminar pedido: ' + (error.error || 'Error desconocido');
+        }
+      });
+    }
   }
 }

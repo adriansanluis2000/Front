@@ -19,7 +19,12 @@
                 <td>{{ pedido.id }}</td>
                 <td>{{ pedido.fecha | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td>{{ pedido.precioTotal + '€' }}</td>
-                <td><button (click)="verDetallesPedido(pedido.id)">Ver Detalles</button></td>
+                <td><button (click)="verDetallesPedido(pedido.id)">Ver Detalles</button>
+                    <button (click)="eliminarPedido(pedido.id)" aria-label="Eliminar pedido"
+                        class="action-button delete-button">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
             </tr>
         </tbody>
     </table>

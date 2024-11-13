@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HistorialPedidosComponent } from './historial-pedidos.component';
 import { PedidoService } from '../../services/pedido.service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('HistorialPedidosComponent', () => {
@@ -10,7 +10,7 @@ describe('HistorialPedidosComponent', () => {
   let pedidoServiceMock: jasmine.SpyObj<PedidoService>;
 
   beforeEach(async () => {
-    pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['obtenerHistorialPedidos']);
+    pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['obtenerHistorialPedidos', 'eliminarPedido']);
 
     await TestBed.configureTestingModule({
       imports: [HistorialPedidosComponent],
@@ -63,7 +63,7 @@ describe('HistorialPedidosComponent', () => {
       component.obtenerHistorial();
 
       expect(pedidoServiceMock.obtenerHistorialPedidos).not.toHaveBeenCalled();
-      expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');      
+      expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
     });
   })
 
@@ -119,4 +119,69 @@ describe('HistorialPedidosComponent', () => {
       });
     })
   })
+
+  describe('Eliminar pedido', () => {
+    const pedidoId = 1;
+    beforeEach(() => {
+      fixture = TestBed.createComponent(HistorialPedidosComponent);
+      component = fixture.componentInstance;
+
+      component.pedidos = [
+        {
+          id: 1,
+          fecha: '2024-11-13',
+          precioTotal: 120.50,
+          Productos: [
+            { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
+          ]
+        }
+      ];
+    });
+    describe('Prueba de éxito', () => {
+      it('debe eliminar el pedido correctamente y actualizar la lista', () => {
+        spyOn(window, 'confirm').and.returnValue(true);
+        pedidoServiceMock.eliminarPedido.and.returnValue(of({}));
+
+        component.eliminarPedido(pedidoId);
+
+        expect(pedidoServiceMock.eliminarPedido).toHaveBeenCalledWith(pedidoId);
+        expect(component.pedidos.length).toBe(0);
+      });
+    });
+
+    describe('Prueba de cancelación', () => {
+      it('no debe eliminar el pedido si el usuario cancela la eliminación', () => {
+        spyOn(window, 'confirm').and.returnValue(false);
+
+        component.eliminarPedido(pedidoId);
+
+        expect(pedidoServiceMock.eliminarPedido).not.toHaveBeenCalled();
+        expect(component.pedidos.length).toBe(1);
+      });
+    });
+
+    describe('Fallo en la base de datos', () => {
+      it('debe mostrar un mensaje de error cuando ocurre un fallo en la base de datos', () => {
+        spyOn(window, 'confirm').and.returnValue(true);
+        pedidoServiceMock.eliminarPedido.and.returnValue(throwError({ error: 'Error de base de datos' }));
+        component.eliminarPedido(pedidoId);
+
+        expect(pedidoServiceMock.eliminarPedido).toHaveBeenCalledWith(pedidoId);
+        expect(component.errorMessage).toBe('Error al eliminar pedido: Error de base de datos');
+      });
+    });
+
+    describe('Pérdida de conexión a internet', () => {
+      it('debe mostrar un mensaje de error cuando no hay conexión a internet', () => {
+        spyOn(window, 'confirm').and.returnValue(true);
+        spyOnProperty(navigator, 'onLine').and.returnValue(false);
+
+        component.eliminarPedido(pedidoId);
+
+        expect(pedidoServiceMock.eliminarPedido).not.toHaveBeenCalled();
+        expect(component.errorMessage).toBe('No se pudo eliminar el pedido debido a una pérdida de conexión. Verifica tu conexión e inténtalo de nuevo.');
+      });
+    });
+  })
+
 });
