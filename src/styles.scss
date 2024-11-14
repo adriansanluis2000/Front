@@ -45,3 +45,16 @@ form {
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
+.search-container {
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.search-input {
+  width: 250px;
+  padding: 5px 10px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}

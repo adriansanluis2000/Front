@@ -31,7 +31,6 @@ describe('RegistrarPedidoComponent', () => {
       { id: 2, nombre: 'Producto 2', precio: 15 }
     ]));
 
-    fixture.detectChanges();
     component.cargarProductos();
   });
 
@@ -60,7 +59,7 @@ describe('RegistrarPedidoComponent', () => {
       component.registrarPedido();
 
       expect(pedidoServiceMock.registrarPedido).not.toHaveBeenCalled();
-      expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.'); // Comprobamos el mensaje de error
+      expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
     });
 
     it('debería reintentar guardar el pedido una vez se restablece la conexión', () => {
@@ -123,6 +122,7 @@ describe('RegistrarPedidoComponent', () => {
         component.productosPedido.push({ producto: productoMock, cantidad: 1 });
 
         component.quitarProducto({ producto: productoMock, cantidad: 1 });
+        spyOn(window, 'confirm').and.returnValue(true);
 
         expect(component.productosPedido.length).toBe(0); // Debería estar vacío después de la eliminación
       });

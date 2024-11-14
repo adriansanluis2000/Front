@@ -45,9 +45,9 @@ describe('ListaProductosComponent', () => {
       productoServiceMock.obtenerProductos.and.returnValue(of([]));
       fixture.detectChanges();
 
-      const noProductsMessage = fixture.nativeElement.querySelector('.no-products-message');
-      expect(noProductsMessage).toBeTruthy();
-      expect(noProductsMessage.textContent).toContain('No se encontraron productos.');
+      const errorMessage = fixture.nativeElement.querySelector('.empty-list-message p');
+      expect(errorMessage).toBeTruthy();
+      expect(errorMessage.textContent).toContain('No se encontraron productos.');
     });
   });
 

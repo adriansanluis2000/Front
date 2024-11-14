@@ -53,16 +53,17 @@ describe('HistorialPedidosComponent', () => {
       fixture.detectChanges();
 
       // Verificar que se muestra el mensaje de error
-      const errorMessage = fixture.nativeElement.querySelector('.error-message p');
+      const errorMessage = fixture.nativeElement.querySelector('.empty-list-message p');
+      expect(errorMessage).toBeTruthy();
       expect(errorMessage.textContent).toContain('No se encontraron pedidos.');
     });
 
     it('debe mostrar un mensaje de error si no se puede cargar el historial de pedidos por un problema de red', () => {
-      // Simular un error de conexión
-      spyOnProperty(navigator, 'onLine').and.returnValue(false);
-      component.obtenerHistorial();
-
-      expect(pedidoServiceMock.obtenerHistorialPedidos).not.toHaveBeenCalled();
+      spyOn(console, 'error');
+      pedidoServiceMock.obtenerHistorialPedidos.and.returnValue(throwError({ status: 0 }));
+      fixture.detectChanges();
+      
+      expect(pedidoServiceMock.obtenerHistorialPedidos).toHaveBeenCalled();
       expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
     });
   })
@@ -113,12 +114,13 @@ describe('HistorialPedidosComponent', () => {
         fixture.detectChanges();
 
         // Esperar que el mensaje de error se muestre
-        const errorMessage = fixture.nativeElement.querySelector('.error-message');
+        const errorMessage = fixture.nativeElement.querySelector('.empty-list-message');
         expect(errorMessage).toBeTruthy();
         expect(errorMessage.textContent).toContain('No se encontraron pedidos');
       });
     })
   })
+
 
   describe('Eliminar pedido', () => {
     const pedidoId = 1;
@@ -137,6 +139,7 @@ describe('HistorialPedidosComponent', () => {
         }
       ];
     });
+
     describe('Prueba de éxito', () => {
       it('debe eliminar el pedido correctamente y actualizar la lista', () => {
         spyOn(window, 'confirm').and.returnValue(true);
