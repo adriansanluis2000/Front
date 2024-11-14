@@ -4,6 +4,7 @@
     <div class="search-container">
         <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrarPedidos()" placeholder="Buscar pedido..."
             class="search-input" />
+        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div> <!-- Mensaje de error -->
     </div>
 
     <table>
@@ -18,7 +19,7 @@
         <tbody>
             <!-- Mostrar mensaje si no hay pedidos -->
             <tr *ngIf="pedidos.length === 0">
-                <td colspan="5" class="empty-list-message">
+                <td colspan="5" class="error-message">
                     <p>No se encontraron pedidos.</p>
                 </td>
             </tr>

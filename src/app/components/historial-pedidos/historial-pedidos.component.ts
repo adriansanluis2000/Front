@@ -22,7 +22,6 @@ export class HistorialPedidosComponent implements OnInit {
 
   ngOnInit(): void {
     this.obtenerHistorial();
-    this.pedidosOriginales = [...this.pedidos];
   }
 
   obtenerHistorial(): void {
@@ -32,6 +31,7 @@ export class HistorialPedidosComponent implements OnInit {
           this.errorMessage = 'No se encontraron pedidos.';
         } else {
           this.errorMessage = '';
+          this.pedidosOriginales = data;
           // Ordenar los pedidos de más reciente a más antiguo
           this.pedidos = data.sort((a, b) => {
             return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
@@ -49,27 +49,25 @@ export class HistorialPedidosComponent implements OnInit {
   }
 
   filtrarPedidos(): void {
-    const terminos = this.busqueda
-      .split(' ')
-      .map(termino => termino.trim().toLowerCase())
-      .filter(termino => termino !== '');
+    const regex = /^\d*$/; // Expresión regular para validar solo números
 
-    // Restauramos la lista de pedidos a la lista original antes de filtrar
-    this.pedidos = [...this.pedidosOriginales];
-
-    // Filtramos solo si hay términos de búsqueda
-    if (terminos.length > 0) {
-      this.pedidos = this.pedidos.filter(pedido =>
-        terminos.every(termino => pedido.id.toString().toLowerCase().includes(termino))
-      );
+    if (!regex.test(this.busqueda)) {
+      this.errorMessage = 'Número de pedido inválido. Solo se permiten números.';
+      this.pedidos = [...this.pedidosOriginales];
+      return;
     }
 
-    // Mostrar mensaje de error si no hay pedidos encontrados
-    if (this.pedidos.length === 0) {
-      this.errorMessage = 'No se encontraron pedidos.';
-    } else {
-      this.errorMessage = '';
-    }
+    this.errorMessage = '';
+
+    const terminos = this.busqueda.trim().toLowerCase();
+
+    // Filtrar solo si hay términos de búsqueda
+    this.pedidos = terminos ? this.pedidosOriginales.filter(pedido => 
+      pedido.id.toString().includes(terminos)
+    ) : [...this.pedidosOriginales];
+
+    // Verificar si no hay resultados
+    this.errorMessage = this.pedidos.length === 0 ? 'No se encontraron pedidos.' : '';
   }
 
 

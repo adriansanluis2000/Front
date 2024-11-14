@@ -9,6 +9,24 @@ describe('HistorialPedidosComponent', () => {
   let fixture: ComponentFixture<HistorialPedidosComponent>;
   let pedidoServiceMock: jasmine.SpyObj<PedidoService>;
 
+  const pedidosMock = [
+    {
+      id: 1, fecha: '2024-11-12T10:00:00', precioTotal: 100, estado: 'Enviado', Productos: [
+        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
+      ]
+    },
+    {
+      id: 2, fecha: '2024-11-11T15:00:00', precioTotal: 50, estado: 'Enviado', Productos: [
+        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
+      ]
+    },
+    {
+      id: 3, fecha: '2024-11-10T09:00:00', precioTotal: 200, estado: 'Enviado', Productos: [
+        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
+      ]
+    }
+  ];
+
   beforeEach(async () => {
     pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['obtenerHistorialPedidos', 'eliminarPedido']);
 
@@ -26,11 +44,6 @@ describe('HistorialPedidosComponent', () => {
 
   describe('Prueba de éxito', () => {
     it('debe mostrar los pedidos ordenados de más reciente a más antiguo', () => {
-      const pedidosMock = [
-        { id: 1, fecha: '2024-11-12T10:00:00', precioTotal: 100, estado: 'Enviado' },
-        { id: 2, fecha: '2024-11-11T15:00:00', precioTotal: 50, estado: 'Enviado' },
-        { id: 3, fecha: '2024-11-10T09:00:00', precioTotal: 200, estado: 'Enviado' }
-      ];
 
       // Mock de los pedidos devueltos por el servicio
       pedidoServiceMock.obtenerHistorialPedidos.and.returnValue(of(pedidosMock));
@@ -53,7 +66,7 @@ describe('HistorialPedidosComponent', () => {
       fixture.detectChanges();
 
       // Verificar que se muestra el mensaje de error
-      const errorMessage = fixture.nativeElement.querySelector('.empty-list-message p');
+      const errorMessage = fixture.nativeElement.querySelector('.error-message p');
       expect(errorMessage).toBeTruthy();
       expect(errorMessage.textContent).toContain('No se encontraron pedidos.');
     });
@@ -62,7 +75,7 @@ describe('HistorialPedidosComponent', () => {
       spyOn(console, 'error');
       pedidoServiceMock.obtenerHistorialPedidos.and.returnValue(throwError({ status: 0 }));
       fixture.detectChanges();
-      
+
       expect(pedidoServiceMock.obtenerHistorialPedidos).toHaveBeenCalled();
       expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
     });
@@ -114,7 +127,7 @@ describe('HistorialPedidosComponent', () => {
         fixture.detectChanges();
 
         // Esperar que el mensaje de error se muestre
-        const errorMessage = fixture.nativeElement.querySelector('.empty-list-message');
+        const errorMessage = fixture.nativeElement.querySelector('.error-message');
         expect(errorMessage).toBeTruthy();
         expect(errorMessage.textContent).toContain('No se encontraron pedidos');
       });
@@ -128,16 +141,7 @@ describe('HistorialPedidosComponent', () => {
       fixture = TestBed.createComponent(HistorialPedidosComponent);
       component = fixture.componentInstance;
 
-      component.pedidos = [
-        {
-          id: 1,
-          fecha: '2024-11-13',
-          precioTotal: 120.50,
-          Productos: [
-            { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
-          ]
-        }
-      ];
+      component.pedidos = [pedidosMock[0]];
     });
 
     describe('Prueba de éxito', () => {
@@ -187,4 +191,37 @@ describe('HistorialPedidosComponent', () => {
     });
   })
 
+  describe('Búsqueda por ID', () => {
+    beforeEach(() => {
+      component.pedidosOriginales = pedidosMock;
+      component.pedidos = [...pedidosMock];
+    });
+    describe('Prueba de éxito', () => {
+      it('debería filtrar los pedidos por ID', () => {
+        component.busqueda = '1';
+        component.filtrarPedidos();
+        expect(component.pedidos.length).toBe(1);
+        expect(component.pedidos[0].id).toBe(1);
+        expect(component.errorMessage).toBe('');
+      });
+    })
+
+    describe('Prueba de búsqueda sin resultados', () => {
+      it('debería manejar el caso cuando no se encuentran resultados', () => {
+        component.busqueda = '999';
+        component.filtrarPedidos();
+        expect(component.pedidos.length).toBe(0);
+        expect(component.errorMessage).toBe('No se encontraron pedidos.');
+      });
+    })
+
+    describe('Prueba de error por caracteres no válidos', () => {
+      it('debería mostrar un mensaje de error para entradas no válidas', () => {
+        component.busqueda = '#@!';
+        component.filtrarPedidos();
+        expect(component.pedidos.length).toBe(3);
+        expect(component.errorMessage).toBe('Número de pedido inválido. Solo se permiten números.');
+      });
+    })
+  })
 });
