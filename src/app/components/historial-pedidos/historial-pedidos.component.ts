@@ -3,6 +3,7 @@ import { PedidoService } from '../../services/pedido.service';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { Pedido } from '../../models/pedido.model';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-historial-pedidos',
@@ -19,7 +20,10 @@ export class HistorialPedidosComponent implements OnInit {
   errorMessage: string = '';
   errorBusqueda: string = '';
 
-  constructor(private readonly pedidoService: PedidoService) { }
+  constructor(
+    private readonly pedidoService: PedidoService,
+    private readonly router: Router
+  ) { }
 
   ngOnInit(): void {
     this.obtenerHistorial();
@@ -63,7 +67,7 @@ export class HistorialPedidosComponent implements OnInit {
     const terminos = this.busqueda.trim().toLowerCase();
 
     // Filtrar solo si hay términos de búsqueda
-    this.pedidos = terminos ? this.pedidosOriginales.filter(pedido => 
+    this.pedidos = terminos ? this.pedidosOriginales.filter(pedido =>
       pedido.id.toString().includes(terminos)
     ) : [...this.pedidosOriginales];
 
@@ -74,6 +78,10 @@ export class HistorialPedidosComponent implements OnInit {
 
   verDetallesPedido(id: number): void {
     this.pedidoSeleccionado = this.pedidos.find(pedido => pedido.id === id) || null;
+  }
+
+  editarPedido(pedidoId: number) {
+    this.router.navigate(['/registrar-pedido', pedidoId]);
   }
 
   cerrarDetalles(): void {

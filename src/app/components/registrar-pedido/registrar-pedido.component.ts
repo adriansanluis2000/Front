@@ -3,6 +3,8 @@ import { ProductoService } from '../../services/producto.service';
 import { PedidoService } from '../../services/pedido.service';
 import { isPlatformBrowser, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Pedido } from '../../models/pedido.model';
 
 @Component({
   selector: 'app-registrar-pedido',
@@ -15,12 +17,15 @@ export class RegistrarPedidoComponent implements OnInit {
   productos: any[] = [];
   productosPedido: { producto: any, cantidad: number }[] = [];
   pedidoPendiente: any[] = [];
-
+  pedido: Pedido | null = null;
   errorMessage: string = '';
+  actualizarPedido: boolean = false; // Variable para saber si es edición
+  textoBoton: string = 'Registrar pedido'; // Texto del botón
 
   constructor(
     private readonly productoService: ProductoService,
     private readonly pedidoService: PedidoService,
+    private readonly route: ActivatedRoute,
     @Inject(PLATFORM_ID) private readonly platformId: Object
   ) { }
 
@@ -31,6 +36,35 @@ export class RegistrarPedidoComponent implements OnInit {
       // Escuchar el evento de reconexión
       window.addEventListener('online', () => {
         this.checkAndRetryOrder();
+      });
+    }
+
+    const pedidoId = this.route.snapshot.paramMap.get('pedidoId');
+    if (pedidoId) {
+      this.actualizarPedido = true;
+      this.textoBoton = 'Actualizar pedido';
+
+      this.pedidoService.obtenerPedidoPorId(+pedidoId).subscribe((pedido) => {
+        this.pedido = pedido;
+
+        // Cargar los productos del pedido en productosPedido con tipos explícitos
+        this.productosPedido = pedido.Productos.map((producto: {
+          id: number;
+          nombre: string;
+          precio: number;
+          stock: number;
+          descripcion?: string;
+          PedidoProducto: { cantidad: number; };
+        }) => ({
+          producto: {
+            id: producto.id,
+            nombre: producto.nombre,
+            precio: producto.precio,
+            stock: producto.stock,
+            descripcion: producto.descripcion
+          },
+          cantidad: producto.PedidoProducto.cantidad
+        }));
       });
     }
   }
@@ -92,22 +126,47 @@ export class RegistrarPedidoComponent implements OnInit {
       return;
     }
 
-    const datosPedido = this.productosPedido.map(item => ({
-      id: item.producto.id,
-      cantidad: item.cantidad
-    }));
+    if (this.actualizarPedido && this.pedido) {
 
-    this.pedidoService.registrarPedido(datosPedido).subscribe(
-      response => {
-        console.log('Pedido registrado:', response);
-        this.productosPedido = [];
-        this.errorMessage = '';
-      },
-      error => {
-        console.error('Error al registrar el pedido:', error);
-        alert(error.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.');
-      }
-    );
+      const datosPedido = {
+        fecha: new Date().toISOString(),  // Ejemplo de fecha actual en formato ISO
+        productos: this.productosPedido.map(item => ({
+          id: item.producto.id,
+          cantidad: item.cantidad
+        }))
+      };
+      
+      // Actualizar pedido existente
+      this.pedidoService.actualizarPedido(this.pedido.id, datosPedido).subscribe(
+        response => {
+          console.log('Pedido actualizado:', response);
+          this.productosPedido = [];
+          this.errorMessage = '';
+        },
+        error => {
+          console.error('Error al actualizar el pedido:', error);
+          alert(error.error.mensaje || 'No se pudo actualizar el pedido.');
+        }
+      );
+    } else {
+
+      const datosPedido = this.productosPedido.map(item => ({
+        id: item.producto.id,
+        cantidad: item.cantidad
+      }));
+
+      this.pedidoService.registrarPedido(datosPedido).subscribe(
+        response => {
+          console.log('Pedido registrado:', response);
+          this.productosPedido = [];
+          this.errorMessage = '';
+        },
+        error => {
+          console.error('Error al registrar el pedido:', error);
+          alert(error.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.');
+        }
+      );
+    }
   }
 
   checkAndRetryOrder(): void {

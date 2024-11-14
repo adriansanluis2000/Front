@@ -28,8 +28,12 @@ button {
   }
 }
 
-.add-button {
+.button-success {
   background-color: $color-success;
+  margin: 1rem auto;
+  display: block;
+  max-width: 200px;
+  text-align: center;
 
   &:hover {
     background-color: darken($color-success, 10%);

@@ -50,8 +50,8 @@
             </div>
 
             <!-- Botón para registrar el pedido -->
-            <button class="boton-registrar" *ngIf="productosPedido.length > 0" (click)="registrarPedido()">
-                Registrar Pedido
+            <button class="button-success" *ngIf="productosPedido.length > 0" (click)="registrarPedido()">
+                {{ textoBoton }}
             </button>
 
             <!-- Total del pedido -->

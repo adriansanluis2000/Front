@@ -32,6 +32,10 @@
                         class="action-button details-button">
                         <i class="fas fa-eye"></i> <!-- Usamos el icono de "ojo" para ver detalles -->
                     </button>
+                    <button (click)="editarPedido(pedido.id)" aria-label="Editar pedido"
+                        class="action-button edit-button">
+                        <i class="fas fa-edit"></i>
+                    </button>
                     <button (click)="eliminarPedido(pedido.id)" aria-label="Eliminar pedido"
                         class="action-button delete-button">
                         <i class="fas fa-trash-alt"></i>

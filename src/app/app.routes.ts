@@ -12,12 +12,17 @@ export const routes: Routes = [
             import('./components/lista-productos/lista-productos.component').then(m => m.ListaProductosComponent)
     },
     {
-        path: 'agregarProducto',
+        path: 'agregar-producto',
         loadComponent: () =>
             import('./components/agregar-producto/agregar-producto.component').then(m => m.AgregarProductoComponent)
     },
     {
-        path: 'registrarPedido',
+        path: 'registrar-pedido',
+        loadComponent: () =>
+            import('./components/registrar-pedido/registrar-pedido.component').then(m => m.RegistrarPedidoComponent)
+    },
+    {
+        path: 'registrar-pedido/:pedidoId',
         loadComponent: () =>
             import('./components/registrar-pedido/registrar-pedido.component').then(m => m.RegistrarPedidoComponent)
     },
