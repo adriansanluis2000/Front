@@ -6,36 +6,6 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-th,
-td {
-  border: 1px solid $color-primary;
-  padding: 12px;
-  text-align: left;
-}
-
-th {
-  background-color: $color-primary;
-  color: white;
-}
-
-td {
-  background-color: #f9f9f9;
-}
-
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-tr:hover {
-  background-color: #ddd;
-}
-
 .modal {
   .modal-content {
     .modal-header {
@@ -102,31 +72,5 @@ tr:hover {
         }
       }
     }
-  }
-}
-
-
-textarea {
-  resize: vertical;
-}
-
-.sort-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-left: 5px;
-  font-size: 1rem;
-
-  &:hover {
-    color: #afafaf;
-  }
-}
-
-.edit-button {
-  background-color: #ff9800;
-  color: white;
-
-  &:hover {
-    background-color: #e68900;
   }
 }

@@ -5,32 +5,6 @@
   padding: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
-  h2 {
-    color: $color-primary;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-
-    th,
-    td {
-      border: 1px solid $color-primary;
-      padding: 8px;
-    }
-
-    td {
-      background-color: #f9f9f9;
-      color: $color-primary;
-    }
-
-    th {
-      background-color: $color-primary;
-      text-align: left;
-      color: $color-text;
-    }
-  }
-
   .modal {
     .modal-content {
       h3 {

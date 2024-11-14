@@ -27,7 +27,11 @@
                 <td>{{ pedido.id }}</td>
                 <td>{{ pedido.fecha | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td>{{ pedido.precioTotal + '€' }}</td>
-                <td><button (click)="verDetallesPedido(pedido.id)">Ver Detalles</button>
+                <td>
+                    <button (click)="verDetallesPedido(pedido.id)" aria-label="Ver detalles del pedido"
+                        class="action-button details-button">
+                        <i class="fas fa-eye"></i> <!-- Usamos el icono de "ojo" para ver detalles -->
+                    </button>
                     <button (click)="eliminarPedido(pedido.id)" aria-label="Eliminar pedido"
                         class="action-button delete-button">
                         <i class="fas fa-trash-alt"></i>

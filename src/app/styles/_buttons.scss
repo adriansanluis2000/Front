@@ -1,17 +1,12 @@
 @import '../styles/variables';
 
 button {
-  background-color: $color-success;
   color: $color-text;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: darken($color-success, 10%);
-  }
 
   &:focus {
     outline: none;
@@ -33,11 +28,46 @@ button {
   }
 }
 
+.add-button {
+  background-color: $color-success;
+
+  &:hover {
+    background-color: darken($color-success, 10%);
+  }
+}
+
 .delete-button {
   background-color: $rojo;
-  color: white;
 
   &:hover {
     background-color: $rojo-oscuro;
+  }
+}
+
+.details-button {
+  background-color: $azul-claro;
+
+  &:hover {
+    background-color: $azul-oscuro;
+  }
+}
+
+.sort-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 1rem;
+
+  &:hover {
+    color: #afafaf;
+  }
+}
+
+.edit-button {
+  background-color: #ff9800;
+
+  &:hover {
+    background-color: #e68900;
   }
 }
