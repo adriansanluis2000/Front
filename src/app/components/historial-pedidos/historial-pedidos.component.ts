@@ -17,6 +17,7 @@ export class HistorialPedidosComponent implements OnInit {
   pedidoSeleccionado: Pedido | null = null;
   busqueda: string = '';
   errorMessage: string = '';
+  errorBusqueda: string = '';
 
   constructor(private readonly pedidoService: PedidoService) { }
 
@@ -52,12 +53,12 @@ export class HistorialPedidosComponent implements OnInit {
     const regex = /^\d*$/; // Expresión regular para validar solo números
 
     if (!regex.test(this.busqueda)) {
-      this.errorMessage = 'Número de pedido inválido. Solo se permiten números.';
+      this.errorBusqueda = 'Número de pedido inválido. Solo se permiten números.';
       this.pedidos = [...this.pedidosOriginales];
       return;
     }
 
-    this.errorMessage = '';
+    this.errorBusqueda = '';
 
     const terminos = this.busqueda.trim().toLowerCase();
 

@@ -220,7 +220,7 @@ describe('HistorialPedidosComponent', () => {
         component.busqueda = '#@!';
         component.filtrarPedidos();
         expect(component.pedidos.length).toBe(3);
-        expect(component.errorMessage).toBe('Número de pedido inválido. Solo se permiten números.');
+        expect(component.errorBusqueda).toBe('Número de pedido inválido. Solo se permiten números.');
       });
     })
   })

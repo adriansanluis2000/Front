@@ -4,7 +4,7 @@
     <div class="search-container">
         <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrarPedidos()" placeholder="Buscar pedido..."
             class="search-input" />
-        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div> <!-- Mensaje de error -->
+        <div *ngIf="errorBusqueda" class="error-message">{{ errorBusqueda }}</div> <!-- Mensaje de error -->
     </div>
 
     <table>
