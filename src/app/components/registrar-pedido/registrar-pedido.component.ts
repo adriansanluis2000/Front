@@ -1,17 +1,23 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID, ViewEncapsulation } from '@angular/core';
 import { ProductoService } from '../../services/producto.service';
 import { PedidoService } from '../../services/pedido.service';
 import { isPlatformBrowser, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Pedido } from '../../models/pedido.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-registrar-pedido',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule],
+  imports: [
+    NgFor,
+    NgIf,
+    FormsModule
+  ],
   templateUrl: './registrar-pedido.component.html',
-  styleUrl: './registrar-pedido.component.scss'
+  styleUrls: ['./registrar-pedido.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class RegistrarPedidoComponent implements OnInit {
   productos: any[] = [];
@@ -19,13 +25,15 @@ export class RegistrarPedidoComponent implements OnInit {
   pedidoPendiente: any[] = [];
   pedido: Pedido | null = null;
   errorMessage: string = '';
-  actualizarPedido: boolean = false; // Variable para saber si es edición
-  textoBoton: string = 'Registrar pedido'; // Texto del botón
+  actualizarPedido: boolean = false;
+  textoBoton: string = 'Registrar pedido';
 
   constructor(
     private readonly productoService: ProductoService,
     private readonly pedidoService: PedidoService,
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly snackBar: MatSnackBar,
     @Inject(PLATFORM_ID) private readonly platformId: Object
   ) { }
 
@@ -94,17 +102,15 @@ export class RegistrarPedidoComponent implements OnInit {
   }
 
   actualizarProducto(item: { producto: any, cantidad: number }): void {
-    // Comprobar si la cantidad es un número
     if (isNaN(item.cantidad) || typeof item.cantidad !== 'number') {
       alert('La cantidad debe ser un número.');
       item.cantidad = 1;
       return;
     }
 
-    // Comprobar si la cantidad es un número decimal
     if (item.cantidad % 1 !== 0) {
-      alert('La cantidad debe ser un número entero.'); // Mensaje de error para decimales
-      item.cantidad = Math.floor(item.cantidad); // Redondear hacia abajo o puedes usar Math.round(item.cantidad)
+      alert('La cantidad debe ser un número entero.');
+      item.cantidad = Math.floor(item.cantidad);
       return;
     }
 
@@ -119,7 +125,6 @@ export class RegistrarPedidoComponent implements OnInit {
   }
 
   registrarPedido(): void {
-    // Verificar si hay conexión a internet
     if (!navigator.onLine) {
       this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
       this.pedidoPendiente = this.productosPedido.map(item => ({ id: item.producto.id, cantidad: item.cantidad }));
@@ -127,29 +132,41 @@ export class RegistrarPedidoComponent implements OnInit {
     }
 
     if (this.actualizarPedido && this.pedido) {
-
       const datosPedido = {
-        fecha: new Date().toISOString(),  // Ejemplo de fecha actual en formato ISO
+        fecha: new Date().toISOString(),
         productos: this.productosPedido.map(item => ({
           id: item.producto.id,
           cantidad: item.cantidad
         }))
       };
-      
-      // Actualizar pedido existente
+
       this.pedidoService.actualizarPedido(this.pedido.id, datosPedido).subscribe(
         response => {
           console.log('Pedido actualizado:', response);
           this.productosPedido = [];
           this.errorMessage = '';
+
+          this.snackBar.open('Pedido registrado con éxito', '', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-success'],
+          });
+
+          this.router.navigate(['/pedidos']);
         },
         error => {
+          this.snackBar.open('Error al registrar el pedido', '', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error']
+          });
           console.error('Error al actualizar el pedido:', error);
           alert(error.error.mensaje || 'No se pudo actualizar el pedido.');
         }
       );
     } else {
-
       const datosPedido = this.productosPedido.map(item => ({
         id: item.producto.id,
         cantidad: item.cantidad
@@ -196,5 +213,4 @@ export class RegistrarPedidoComponent implements OnInit {
       this.productosPedido = [];
     }
   }
-
 }

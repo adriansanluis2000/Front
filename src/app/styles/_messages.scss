@@ -12,3 +12,14 @@
 .error-message p {
   margin: 0;
 }
+
+/* Estilos específicos para MatSnackBar */
+.mat-snack-bar-container.snackbar-success {
+  background-color: #4caf50 !important;  /* Verde */
+  color: white;
+}
+
+.mat-snack-bar-container.snackbar-error {
+  background-color: #f44336 !important;  /* Rojo */
+  color: white;
+}
