@@ -79,14 +79,14 @@ export class ListaProductosComponent implements OnInit {
   eliminarProducto(id: number): void {
     const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar este producto?');
     if (confirmacion) {
-      this.productoService.eliminarProducto(id).subscribe(
-        () => {
+      this.productoService.eliminarProducto(id).subscribe({
+        next: () => {
           this.productos = this.productos.filter(producto => producto.id !== id);
         },
-        (error) => {
-          console.error('Error al eliminar producto', error);
+        error: (e) => {
+          console.error('Error al eliminar producto', e);
         }
-      );
+      });
     }
   }
 

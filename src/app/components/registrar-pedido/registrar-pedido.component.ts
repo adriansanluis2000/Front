@@ -98,7 +98,9 @@ export class RegistrarPedidoComponent implements OnInit {
   }
 
   quitarProducto(item: { producto: any, cantidad: number }): void {
-    this.productosPedido = this.productosPedido.filter(orderItem => orderItem !== item);
+    this.productosPedido = this.productosPedido.filter(
+      orderItem => orderItem.producto.id !== item.producto.id
+    );
   }
 
   actualizarProducto(item: { producto: any, cantidad: number }): void {
@@ -114,12 +116,23 @@ export class RegistrarPedidoComponent implements OnInit {
       return;
     }
 
+    if (item.cantidad > item.producto.stock) {
+      alert('La cantidad solicitada supera el stock disponible.');
+      item.cantidad = item.producto.stock;
+      return;
+    }
+
     if (item.cantidad < 1) {
       const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar este producto?');
       if (confirmacion) {
         this.quitarProducto(item);
       } else {
         item.cantidad = 1;
+      }
+    } else {
+      const index = this.productosPedido.findIndex(p => p.producto.id === item.producto.id);
+      if (index !== -1) {
+        this.productosPedido[index].cantidad = item.cantidad;
       }
     }
   }
@@ -140,8 +153,8 @@ export class RegistrarPedidoComponent implements OnInit {
         }))
       };
 
-      this.pedidoService.actualizarPedido(this.pedido.id, datosPedido).subscribe(
-        response => {
+      this.pedidoService.actualizarPedido(this.pedido.id, datosPedido).subscribe({
+        next: (response) => {
           console.log('Pedido actualizado:', response);
           this.productosPedido = [];
           this.errorMessage = '';
@@ -155,57 +168,56 @@ export class RegistrarPedidoComponent implements OnInit {
 
           this.router.navigate(['/pedidos']);
         },
-        error => {
+        error: (e) => {
           this.snackBar.open('Error al registrar el pedido', '', {
             duration: 3000,
             horizontalPosition: 'right',
             verticalPosition: 'top',
             panelClass: ['snackbar-error']
           });
-          console.error('Error al actualizar el pedido:', error);
-          alert(error.error.mensaje || 'No se pudo actualizar el pedido.');
+          console.error('Error al actualizar el pedido:', e);
+          alert(e.error.mensaje || 'No se pudo actualizar el pedido.');
         }
-      );
+      });
     } else {
       const datosPedido = this.productosPedido.map(item => ({
         id: item.producto.id,
         cantidad: item.cantidad
       }));
 
-      this.pedidoService.registrarPedido(datosPedido).subscribe(
-        response => {
+      this.pedidoService.registrarPedido(datosPedido).subscribe({
+        next: (response) => {
           console.log('Pedido registrado:', response);
           this.productosPedido = [];
           this.errorMessage = '';
         },
-        error => {
+        error: error => {
           console.error('Error al registrar el pedido:', error);
           alert(error.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.');
         }
-      );
+      });
     }
   }
 
   checkAndRetryOrder(): void {
     if (navigator.onLine && this.pedidoPendiente.length > 0) {
-      this.pedidoService.registrarPedido(this.pedidoPendiente).subscribe(
-        response => {
+      this.pedidoService.registrarPedido(this.pedidoPendiente).subscribe({
+        next: (response) => {
           console.log('Pedido registrado tras reconexión:', response);
           this.pedidoPendiente = [];
         },
-        error => {
-          console.error('Error al reintentar registrar el pedido:', error);
-          this.errorMessage = error.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.';
+        error: (e) => {
+          console.error('Error al reintentar registrar el pedido:', e);
+          this.errorMessage = e.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.';
         }
-      );
+      });
     }
   }
 
   calcularTotalPedido(): number {
-    return this.productosPedido.reduce((total, item) => {
-      return total + (item.producto.precio * item.cantidad);
-    }, 0);
+    return this.productosPedido.reduce((total, item) => total + item.producto.precio * item.cantidad, 0);
   }
+
 
   eliminarTodosLosProductos(): void {
     const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar TODOS los productos?');

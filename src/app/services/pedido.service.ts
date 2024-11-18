@@ -11,7 +11,7 @@ export class PedidoService {
 
   constructor(private readonly http: HttpClient) { }
 
-  registrarPedido(datosPedido: { id: number, cantidad: number }[]) {
+  registrarPedido(datosPedido: { id: number, cantidad: number }[]): Observable<any> {
     return this.http.post(this.apiUrl, { productos: datosPedido });
   }
 

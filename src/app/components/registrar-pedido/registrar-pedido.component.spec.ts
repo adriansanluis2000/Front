@@ -3,12 +3,14 @@ import { RegistrarPedidoComponent } from './registrar-pedido.component';
 import { ProductoService } from '../../services/producto.service';
 import { PedidoService } from '../../services/pedido.service';
 import { of, throwError } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 describe('RegistrarPedidoComponent', () => {
   let component: RegistrarPedidoComponent;
   let fixture: ComponentFixture<RegistrarPedidoComponent>;
   let pedidoServiceMock: jasmine.SpyObj<PedidoService>;
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
+  let activatedRouteMock: Partial<ActivatedRoute>;
 
   beforeEach(async () => {
     pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['registrarPedido']);
@@ -18,7 +20,8 @@ describe('RegistrarPedidoComponent', () => {
       imports: [RegistrarPedidoComponent],
       providers: [
         { provide: PedidoService, useValue: pedidoServiceMock },
-        { provide: ProductoService, useValue: productoServiceMock }
+        { provide: ProductoService, useValue: productoServiceMock },
+        { provide: ActivatedRoute, useValue: activatedRouteMock }
       ],
     }).compileComponents();
 
@@ -122,20 +125,8 @@ describe('RegistrarPedidoComponent', () => {
         component.productosPedido.push({ producto: productoMock, cantidad: 1 });
 
         component.quitarProducto({ producto: productoMock, cantidad: 1 });
-        spyOn(window, 'confirm').and.returnValue(true);
 
         expect(component.productosPedido.length).toBe(0); // Debería estar vacío después de la eliminación
-      });
-    });
-
-    describe('Prueba de Error por Cancelación de la Confirmación de Eliminación', () => {
-      it('debería mantener el producto en el pedido si el usuario cancela la eliminación', () => {
-        const productoMock = { id: 1, nombre: 'Producto 1', precio: 10 };
-        component.productosPedido.push({ producto: productoMock, cantidad: 1 });
-
-        component.quitarProducto({ producto: productoMock, cantidad: 1 });
-
-        expect(component.productosPedido.length).toBe(1); // El producto debe permanecer en el pedido
       });
     });
   });
@@ -195,6 +186,25 @@ describe('RegistrarPedidoComponent', () => {
         expect(window.alert).toHaveBeenCalledWith('La cantidad debe ser un número entero.');
         expect(item.cantidad).toBe(1);
         expect(component.calcularTotalPedido()).toBe(10);
+      });
+    });
+
+    describe('Prueba de Error por Exceder Stock Disponible de un Producto', () => {
+      it('debería mostrar un mensaje de error y ajustar la cantidad al máximo disponible si se introduce una cantidad mayor al stock', () => {
+        const productoMock = { id: 1, nombre: 'Producto 1', precio: 10, stock: 5 };
+        component.productos.push(productoMock);
+
+        component.agregarProducto(productoMock);
+        component.productosPedido[0].cantidad = 6; // Intento de agregar más que el stock
+
+        // Simulando el comportamiento dentro de actualizarProducto
+        spyOn(window, 'alert');
+
+        component.actualizarProducto(component.productosPedido[0]);
+
+        expect(window.alert).toHaveBeenCalledWith('La cantidad solicitada supera el stock disponible.');
+        expect(component.productosPedido[0].cantidad).toBe(5); // La cantidad se ajusta al máximo disponible
+        expect(component.calcularTotalPedido()).toBe(50); // Total ajustado
       });
     });
   });
