@@ -13,7 +13,7 @@
                 <th>ID</th>
                 <th>Fecha</th>
                 <th>Total</th>
-                <th>Detalles</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -64,6 +64,10 @@
                         <span class="producto-cantidad">Cantidad: {{ producto.PedidoProducto.cantidad }}</span>
                     </li>
                 </ul>
+
+                <button (click)="editarPedido(pedidoSeleccionado.id)" aria-label="Editar pedido"
+                    class="button-success">Editar
+                </button>
             </div>
         </div>
     </div>
