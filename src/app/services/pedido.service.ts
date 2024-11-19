@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -11,13 +11,19 @@ export class PedidoService {
 
   constructor(private readonly http: HttpClient) { }
 
-  registrarPedido(datosPedido: { id: number, cantidad: number }[]): Observable<any> {
-    return this.http.post(this.apiUrl, { productos: datosPedido });
+  registrarPedido(datosPedido: any): Observable<any> {
+    return this.http.post(this.apiUrl, datosPedido);
   }
 
-  obtenerHistorialPedidos(): Observable<any> {
-    return this.http.get(this.apiUrl);
+  obtenerHistorialPedidos(tipo: string): Observable<any> {
+    let params = new HttpParams();
+    if (tipo) {
+      params = params.append('tipo', tipo); // Añadimos el parámetro tipo
+    }
+  
+    return this.http.get(this.apiUrl, { params });
   }
+  
 
   eliminarPedido(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);

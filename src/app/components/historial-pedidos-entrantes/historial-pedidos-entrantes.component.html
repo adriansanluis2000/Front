@@ -1,0 +1,74 @@
+<div class="historial-pedidos-entrantes">
+    <h2>Historial de Pedidos Entrantes</h2>
+
+    <div class="search-container">
+        <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrarPedidos()" placeholder="Buscar pedido..."
+            class="search-input" />
+        <div *ngIf="errorBusqueda" class="error-message">{{ errorBusqueda }}</div> <!-- Mensaje de error -->
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Mostrar mensaje si no hay pedidos -->
+            <tr *ngIf="pedidos.length === 0">
+                <td colspan="5" class="error-message">
+                    <p>No se encontraron pedidos.</p>
+                </td>
+            </tr>
+            <tr *ngFor="let pedido of pedidos">
+                <td>{{ pedido.id }}</td>
+                <td>{{ pedido.fecha | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td>{{ pedido.precioTotal + '€' }}</td>
+                <td>
+                    <button (click)="verDetallesPedido(pedido.id)" aria-label="Ver detalles del pedido"
+                        class="action-button details-button">
+                        <i class="fas fa-eye"></i> <!-- Usamos el icono de "ojo" para ver detalles -->
+                    </button>
+                    <button (click)="editarPedido(pedido.id)" aria-label="Editar pedido"
+                        class="action-button edit-button">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button (click)="eliminarPedido(pedido.id)" aria-label="Eliminar pedido"
+                        class="action-button delete-button">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Modal para mostrar los detalles del pedido -->
+    <div *ngIf="pedidoSeleccionado" class="modal">
+        <div class="modal-content">
+            <span class="close" (click)="cerrarDetalles()">&times;</span>
+
+            <!-- Contenido de los detalles del pedido directamente en el modal -->
+            <div class="detalles-pedido">
+                <h3>Detalles del Pedido #{{ pedidoSeleccionado.id }}</h3>
+                <p><strong>Fecha:</strong> {{ pedidoSeleccionado.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+                <p><strong>Total:</strong> {{ pedidoSeleccionado.precioTotal + '€' }}</p>
+
+                <h4>Productos:</h4>
+                <ul>
+                    <li *ngFor="let producto of pedidoSeleccionado.Productos" class="producto-item">
+                        <span class="producto-nombre">{{ producto.nombre }}</span>
+                        <span class="producto-precio">{{ producto.precio + '€' }}</span>
+                        <span class="producto-cantidad">Cantidad: {{ producto.PedidoProducto.cantidad }}</span>
+                    </li>
+                </ul>
+
+                <button (click)="editarPedido(pedidoSeleccionado.id)" aria-label="Editar pedido"
+                    class="button-success">Editar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

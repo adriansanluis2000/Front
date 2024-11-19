@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RegistrarPedidoComponent } from './registrar-pedido.component';
+import { RegistrarPedidoSalienteComponent } from './registrar-pedido-saliente.component';
 import { ProductoService } from '../../services/producto.service';
 import { PedidoService } from '../../services/pedido.service';
 import { of, throwError } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
-describe('RegistrarPedidoComponent', () => {
-  let component: RegistrarPedidoComponent;
-  let fixture: ComponentFixture<RegistrarPedidoComponent>;
+describe('RegistrarPedidoSalienteComponent', () => {
+  let component: RegistrarPedidoSalienteComponent;
+  let fixture: ComponentFixture<RegistrarPedidoSalienteComponent>;
   let pedidoServiceMock: jasmine.SpyObj<PedidoService>;
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
   let activatedRouteMock: Partial<ActivatedRoute>;
@@ -17,7 +17,7 @@ describe('RegistrarPedidoComponent', () => {
     productoServiceMock = jasmine.createSpyObj('ProductoService', ['obtenerProductos']);
 
     await TestBed.configureTestingModule({
-      imports: [RegistrarPedidoComponent],
+      imports: [RegistrarPedidoSalienteComponent],
       providers: [
         { provide: PedidoService, useValue: pedidoServiceMock },
         { provide: ProductoService, useValue: productoServiceMock },
@@ -25,7 +25,7 @@ describe('RegistrarPedidoComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(RegistrarPedidoComponent);
+    fixture = TestBed.createComponent(RegistrarPedidoSalienteComponent);
     component = fixture.componentInstance;
 
     // Mockea el servicio para recibir algunos productos
@@ -78,7 +78,10 @@ describe('RegistrarPedidoComponent', () => {
 
       component.registrarPedido(); // Llama nuevamente para registrar el pedido
 
-      expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith([{ id: 1, cantidad: 1 }]);
+      expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith({
+        productos: [{ id: 1, cantidad: 1 }],
+        tipo: 'saliente'
+      });
     });
   });
 
@@ -113,7 +116,10 @@ describe('RegistrarPedidoComponent', () => {
       component.registrarPedido();
 
       expect(component.productosPedido.length).toBe(0);
-      expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith([{ id: 1, cantidad: 1 }]);
+      expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith({
+        productos: [{ id: 1, cantidad: 1 }],
+        tipo: 'saliente'
+      });
     });
   });
 
@@ -186,25 +192,6 @@ describe('RegistrarPedidoComponent', () => {
         expect(window.alert).toHaveBeenCalledWith('La cantidad debe ser un número entero.');
         expect(item.cantidad).toBe(1);
         expect(component.calcularTotalPedido()).toBe(10);
-      });
-    });
-
-    describe('Prueba de Error por Exceder Stock Disponible de un Producto', () => {
-      it('debería mostrar un mensaje de error y ajustar la cantidad al máximo disponible si se introduce una cantidad mayor al stock', () => {
-        const productoMock = { id: 1, nombre: 'Producto 1', precio: 10, stock: 5 };
-        component.productos.push(productoMock);
-
-        component.agregarProducto(productoMock);
-        component.productosPedido[0].cantidad = 6; // Intento de agregar más que el stock
-
-        // Simulando el comportamiento dentro de actualizarProducto
-        spyOn(window, 'alert');
-
-        component.actualizarProducto(component.productosPedido[0]);
-
-        expect(window.alert).toHaveBeenCalledWith('La cantidad solicitada supera el stock disponible.');
-        expect(component.productosPedido[0].cantidad).toBe(5); // La cantidad se ajusta al máximo disponible
-        expect(component.calcularTotalPedido()).toBe(50); // Total ajustado
       });
     });
   });

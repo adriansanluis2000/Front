@@ -7,10 +7,18 @@
         <ul>
             <li><a routerLink="/productos">Ver Productos</a></li>
             <li><a routerLink="/agregar-producto">Añadir Producto</a></li>
-            <li><a routerLink="/registrar-pedido">Registrar Pedido</a></li>
-            <li><a routerLink="/pedidos">Historial de pedidos</a></li>
+            <li>
+                <a href="#">Pedidos</a>
+                <ul>
+                    <li><a routerLink="/registrar-pedido-entrante">Registrar Pedido Entrante</a></li>
+                    <li><a routerLink="/historial-pedidos-entrantes">Historial de Pedidos Entrantes</a></li>
+                    <li><a routerLink="/registrar-pedido-saliente">Registrar Pedido Saliente</a></li>
+                    <li><a routerLink="/historial-pedidos-salientes">Historial de Pedidos Salientes</a></li>
+                </ul>
+            </li>
         </ul>
     </nav>
+
 
     <main class="content">
         <router-outlet></router-outlet>

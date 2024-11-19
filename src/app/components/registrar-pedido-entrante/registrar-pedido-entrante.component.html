@@ -1,0 +1,63 @@
+<div class="registrar-pedido-entrante">
+    <h2>Registrar Pedido Entrante</h2>
+
+    <div class="contenedor">
+        <!-- Lista de productos -->
+        <section class="lista-productos">
+            <h3>Lista de Productos</h3>
+            <ul>
+                <li *ngFor="let producto of productos" (click)="agregarProducto(producto)">
+                    {{ producto.nombre }} - {{ producto.precio }} €
+                </li>
+            </ul>
+        </section>
+
+        <!-- Lista de productos en el pedido -->
+        <section class="formulario-pedido">
+            <h3>Productos en el Pedido</h3>
+
+            <!-- Contenedor para el botón eliminar todos -->
+            <div class="eliminar-todos-container">
+                <button class="boton-eliminar-todos" *ngIf="productosPedido.length > 0"
+                    (click)="eliminarTodosLosProductos()">
+                    Eliminar Todos
+                </button>
+            </div>
+
+            <div class="cabecera-pedido">
+                <span>Producto</span>
+                <span>Precio</span>
+                <span>Cantidad</span>
+                <span>Precio Total</span>
+                <span>Acciones</span>
+            </div>
+            <ul>
+                <li *ngFor="let item of productosPedido" class="productos-pedido">
+                    {{ item.producto.nombre }}
+                    <span>{{ item.producto.precio }} €</span>
+                    <input type="number" [(ngModel)]="item.cantidad" (change)="actualizarProducto(item)" min="0" />
+                    <span class="precio-total">{{ item.producto.precio * item.cantidad }} €</span>
+                    <div class="acciones">
+                        <button (click)="quitarProducto(item)" aria-label="Eliminar producto"
+                            class="action-button delete-button">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+            <div *ngIf="productosPedido.length === 0" class="error-message">
+                <p>Añade productos al pedido para continuar.</p>
+            </div>
+
+            <!-- Botón para registrar el pedido -->
+            <button class="button-success" *ngIf="productosPedido.length > 0" (click)="registrarPedido()">
+                {{ textoBoton }}
+            </button>
+
+            <!-- Total del pedido -->
+            <div class="total-pedido">
+                <strong>Total del Pedido: {{ calcularTotalPedido() }} €</strong>
+            </div>
+        </section>
+    </div>
+</div>

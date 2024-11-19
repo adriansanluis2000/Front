@@ -8,18 +8,18 @@ import { Pedido } from '../../models/pedido.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-registrar-pedido',
+  selector: 'app-registrar-pedido-saliente',
   standalone: true,
   imports: [
     NgFor,
     NgIf,
     FormsModule
   ],
-  templateUrl: './registrar-pedido.component.html',
-  styleUrls: ['./registrar-pedido.component.scss'],
+  templateUrl: './registrar-pedido-saliente.component.html',
+  styleUrls: ['./registrar-pedido-saliente.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class RegistrarPedidoComponent implements OnInit {
+export class RegistrarPedidoSalienteComponent implements OnInit {
   productos: any[] = [];
   productosPedido: { producto: any, cantidad: number }[] = [];
   pedidoPendiente: any[] = [];
@@ -116,12 +116,6 @@ export class RegistrarPedidoComponent implements OnInit {
       return;
     }
 
-    if (item.cantidad > item.producto.stock) {
-      alert('La cantidad solicitada supera el stock disponible.');
-      item.cantidad = item.producto.stock;
-      return;
-    }
-
     if (item.cantidad < 1) {
       const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar este producto?');
       if (confirmacion) {
@@ -150,12 +144,49 @@ export class RegistrarPedidoComponent implements OnInit {
         productos: this.productosPedido.map(item => ({
           id: item.producto.id,
           cantidad: item.cantidad
-        }))
+        })),
+        tipo: 'saliente'
       };
 
       this.pedidoService.actualizarPedido(this.pedido.id, datosPedido).subscribe({
         next: (response) => {
           console.log('Pedido actualizado:', response);
+          this.productosPedido = [];
+          this.errorMessage = '';
+
+          this.snackBar.open('Pedido actualizado con éxito', '', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-success'],
+          });
+
+          this.router.navigate(['/historial-pedidos-salientes']);
+        },
+        error: (e) => {
+          console.error('Error al actualizar el pedido:', e);
+          alert(e.error.mensaje || 'No se pudo actualizar el pedido.');
+
+          this.snackBar.open('Error al actualizar el pedido', '', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error']
+          });
+        }
+      });
+    } else {
+      const datosPedido = {
+        productos: this.productosPedido.map(item => ({
+          id: item.producto.id,
+          cantidad: item.cantidad
+        })),
+        tipo: 'saliente'
+      };
+
+      this.pedidoService.registrarPedido(datosPedido).subscribe({
+        next: (response) => {
+          console.log('Pedido registrado:', response);
           this.productosPedido = [];
           this.errorMessage = '';
 
@@ -165,35 +196,17 @@ export class RegistrarPedidoComponent implements OnInit {
             verticalPosition: 'top',
             panelClass: ['snackbar-success'],
           });
-
-          this.router.navigate(['/pedidos']);
         },
         error: (e) => {
+          console.error('Error al registrar el pedido:', e);
+          alert(e.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.');
+
           this.snackBar.open('Error al registrar el pedido', '', {
             duration: 3000,
             horizontalPosition: 'right',
             verticalPosition: 'top',
             panelClass: ['snackbar-error']
           });
-          console.error('Error al actualizar el pedido:', e);
-          alert(e.error.mensaje || 'No se pudo actualizar el pedido.');
-        }
-      });
-    } else {
-      const datosPedido = this.productosPedido.map(item => ({
-        id: item.producto.id,
-        cantidad: item.cantidad
-      }));
-
-      this.pedidoService.registrarPedido(datosPedido).subscribe({
-        next: (response) => {
-          console.log('Pedido registrado:', response);
-          this.productosPedido = [];
-          this.errorMessage = '';
-        },
-        error: error => {
-          console.error('Error al registrar el pedido:', error);
-          alert(error.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.');
         }
       });
     }

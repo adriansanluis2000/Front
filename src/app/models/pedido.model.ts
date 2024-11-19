@@ -12,4 +12,5 @@ export interface Pedido {
             cantidad: number;
         }
     }>;
+    tipo: string;
 }

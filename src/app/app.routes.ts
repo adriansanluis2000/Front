@@ -17,18 +17,33 @@ export const routes: Routes = [
             import('./components/agregar-producto/agregar-producto.component').then(m => m.AgregarProductoComponent)
     },
     {
-        path: 'registrar-pedido',
+        path: 'registrar-pedido-entrante',
         loadComponent: () =>
-            import('./components/registrar-pedido/registrar-pedido.component').then(m => m.RegistrarPedidoComponent)
+            import('./components/registrar-pedido-entrante/registrar-pedido-entrante.component').then(m => m.RegistrarPedidoEntranteComponent)
     },
     {
-        path: 'registrar-pedido/:pedidoId',
+        path: 'registrar-pedido-entrante/:pedidoId',
         loadComponent: () =>
-            import('./components/registrar-pedido/registrar-pedido.component').then(m => m.RegistrarPedidoComponent)
+            import('./components/registrar-pedido-entrante/registrar-pedido-entrante.component').then(m => m.RegistrarPedidoEntranteComponent)
     },
     {
-        path: 'pedidos',
+        path: 'historial-pedidos-entrantes',
         loadComponent: () =>
-            import('./components/historial-pedidos/historial-pedidos.component').then(m => m.HistorialPedidosComponent)
+            import('./components/historial-pedidos-entrantes/historial-pedidos-entrantes.component').then(m => m.HistorialPedidosEntrantesComponent)
+    },
+    {
+        path: 'registrar-pedido-saliente',
+        loadComponent: () =>
+            import('./components/registrar-pedido-saliente/registrar-pedido-saliente.component').then(m => m.RegistrarPedidoSalienteComponent)
+    },
+    {
+        path: 'registrar-pedido-saliente/:pedidoId',
+        loadComponent: () =>
+            import('./components/registrar-pedido-saliente/registrar-pedido-saliente.component').then(m => m.RegistrarPedidoSalienteComponent)
+    },
+    {
+        path: 'historial-pedidos-salientes',
+        loadComponent: () =>
+            import('./components/historial-pedidos-salientes/historial-pedidos-salientes.component').then(m => m.HistorialPedidosSalientesComponent)
     }
 ];

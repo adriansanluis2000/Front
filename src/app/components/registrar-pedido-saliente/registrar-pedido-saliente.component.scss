@@ -1,0 +1,174 @@
+@import '../../styles/variables';
+
+.registrar-pedido-saliente {
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    color: $color-primary;
+    margin-bottom: 1rem;
+  }
+
+  .contenedor {
+    display: flex;
+    gap: 20px;
+  }
+
+  .lista-productos {
+    flex: 1;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        cursor: pointer;
+        margin: 0.5rem 0;
+        padding: 1rem 1rem 1rem 2rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.3s, box-shadow 0.3s;
+        position: relative;
+
+        &:hover {
+          background-color: #e2e2e2;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .nombre-producto {
+          flex: 1;
+          font-weight: bold;
+          color: $color-text;
+        }
+
+        .precio {
+          margin-left: 20px;
+          color: $color-secondary;
+          font-weight: bold;
+        }
+
+        // Pseudo-elemento para añadir un icono o marcador
+        &:before {
+          content: "";
+          position: absolute;
+          left: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 10px;
+          height: 10px;
+          background-color: $color-primary;
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+
+  .formulario-pedido {
+    flex: 2;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+
+    .cabecera-pedido {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      font-weight: bold;
+      margin: 0.5rem 0;
+      border-bottom: 2px solid #ddd;
+      padding: 0.5rem 0;
+
+      span {
+        text-align: left;
+
+        &:first-child {
+          margin-left: 10px;
+        }
+
+        &:last-child {
+          text-align: right;
+          margin-right: 20px;
+        }
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      .productos-pedido {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+        align-items: center;
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: lighten($color-secondary, 5%);
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: lighten($color-secondary, 15%);
+        }
+
+        .precio-total {
+          margin-left: 30px;
+        }
+
+        .acciones {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          margin-right: 30px;
+        }
+
+        input[type="number"] {
+          width: 50px;
+          margin: 0 0.5rem;
+          border: 1px solid $color-primary;
+          border-radius: 5px;
+          padding: 0.2rem;
+        }
+      }
+    }
+
+    .eliminar-todos-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1rem;
+    }
+
+    .boton-eliminar-todos {
+      background-color: $color-danger;
+      margin: 0;
+      display: inline-block;
+      text-align: center;
+
+      &:hover {
+        background-color: darken($color-danger, 10%);
+      }
+    }
+
+    .total-pedido {
+      margin-top: auto;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: $color-primary;
+      text-align: right;
+    }
+  }
+}

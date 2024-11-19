@@ -28,6 +28,15 @@ header {
   list-style-type: none;
 }
 
+.sidebar ul ul {
+  display: none;
+  padding-left: 20px;
+}
+
+.sidebar ul li:hover > ul {
+  display: block;
+}
+
 .sidebar li {
   margin: 1rem 0;
 }

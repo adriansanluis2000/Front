@@ -1,27 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HistorialPedidosComponent } from './historial-pedidos.component';
+import { HistorialPedidosSalientesComponent } from './historial-pedidos-salientes.component';
 import { PedidoService } from '../../services/pedido.service';
 import { of, throwError } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-describe('HistorialPedidosComponent', () => {
-  let component: HistorialPedidosComponent;
-  let fixture: ComponentFixture<HistorialPedidosComponent>;
+describe('HistorialPedidosSalientesComponent', () => {
+  let component: HistorialPedidosSalientesComponent;
+  let fixture: ComponentFixture<HistorialPedidosSalientesComponent>;
   let pedidoServiceMock: jasmine.SpyObj<PedidoService>;
 
   const pedidosMock = [
     {
-      id: 1, fecha: '2024-11-12T10:00:00', precioTotal: 100, estado: 'Enviado', Productos: [
+      id: 1, fecha: '2024-11-12T10:00:00', precioTotal: 100, estado: 'Enviado', tipo: 'saliente', Productos: [
         { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
       ]
     },
     {
-      id: 2, fecha: '2024-11-11T15:00:00', precioTotal: 50, estado: 'Enviado', Productos: [
+      id: 2, fecha: '2024-11-11T15:00:00', precioTotal: 50, estado: 'Enviado', tipo: 'saliente', Productos: [
         { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
       ]
     },
     {
-      id: 3, fecha: '2024-11-10T09:00:00', precioTotal: 200, estado: 'Enviado', Productos: [
+      id: 3, fecha: '2024-11-10T09:00:00', precioTotal: 200, estado: 'Enviado', tipo: 'saliente', Productos: [
         { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
       ]
     }
@@ -31,14 +31,14 @@ describe('HistorialPedidosComponent', () => {
     pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['obtenerHistorialPedidos', 'eliminarPedido']);
 
     await TestBed.configureTestingModule({
-      imports: [HistorialPedidosComponent],
+      imports: [HistorialPedidosSalientesComponent],
       providers: [
         { provide: PedidoService, useValue: pedidoServiceMock }
       ],
       schemas: [NO_ERRORS_SCHEMA] // Para evitar errores con elementos HTML no reconocidos
     }).compileComponents();
 
-    fixture = TestBed.createComponent(HistorialPedidosComponent);
+    fixture = TestBed.createComponent(HistorialPedidosSalientesComponent);
     component = fixture.componentInstance;
   });
 
@@ -138,7 +138,7 @@ describe('HistorialPedidosComponent', () => {
   describe('Eliminar pedido', () => {
     const pedidoId = 1;
     beforeEach(() => {
-      fixture = TestBed.createComponent(HistorialPedidosComponent);
+      fixture = TestBed.createComponent(HistorialPedidosSalientesComponent);
       component = fixture.componentInstance;
 
       component.pedidos = [pedidosMock[0]];

@@ -6,13 +6,13 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-historial-pedidos',
+  selector: 'app-historial-pedidos-salientes',
   standalone: true,
   imports: [NgFor, NgIf, DatePipe, FormsModule],
-  templateUrl: './historial-pedidos.component.html',
-  styleUrl: './historial-pedidos.component.scss'
+  templateUrl: './historial-pedidos-salientes.component.html',
+  styleUrl: './historial-pedidos-salientes.component.scss'
 })
-export class HistorialPedidosComponent implements OnInit {
+export class HistorialPedidosSalientesComponent implements OnInit {
   pedidos: Pedido[] = [];
   pedidosOriginales: Pedido[] = [];
   pedidoSeleccionado: Pedido | null = null;
@@ -30,7 +30,7 @@ export class HistorialPedidosComponent implements OnInit {
   }
 
   obtenerHistorial(): void {
-    this.pedidoService.obtenerHistorialPedidos().subscribe({
+    this.pedidoService.obtenerHistorialPedidos('saliente').subscribe({
       next: (data: Pedido[]) => {
         if (data.length === 0) {
           this.errorMessage = 'No se encontraron pedidos.';
@@ -81,7 +81,7 @@ export class HistorialPedidosComponent implements OnInit {
   }
 
   editarPedido(pedidoId: number) {
-    this.router.navigate(['/registrar-pedido', pedidoId]);
+    this.router.navigate(['/registrar-pedido-saliente', pedidoId]);
   }
 
   cerrarDetalles(): void {
