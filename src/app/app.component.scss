@@ -19,36 +19,70 @@ header {
 }
 
 .sidebar {
-  width: 200px;
+  width: 300px;
   background-color: $color-primary;
   padding: 1rem;
 }
 
 .sidebar ul {
   list-style-type: none;
+  padding: 0;
 }
 
-.sidebar ul ul {
-  display: none;
-  padding-left: 20px;
+.sidebar ul li {
+  margin: 0;
+  border-bottom: 1px solid lighten($color-primary, 15%);
+  padding: 0.5rem;
+  position: relative;
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
-.sidebar ul li:hover > ul {
-  display: block;
-}
-
-.sidebar li {
-  margin: 1rem 0;
-}
-
-.sidebar a {
+.sidebar a,
+.submenu-toggle {
   color: $color-text;
   text-decoration: none;
   font-size: 1.1rem;
+  display: block;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: lighten($color-primary, 10%);
+    transform: translateX(5px);
+    text-decoration: none;
+  }
 }
 
-.sidebar a:hover {
-  text-decoration: underline;
+.submenu-toggle {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+
+.submenu {
+  display: none;
+  padding-left: 1rem;
+  margin-left: 1rem;
+}
+
+.submenu.open {
+  display: block;
+}
+
+.submenu a {
+  color: $color-text;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+
+  &:hover {
+    background-color: lighten($color-primary, 10%);
+  }
 }
 
 .content {

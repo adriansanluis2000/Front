@@ -9,5 +9,13 @@ import { RouterLink, RouterOutlet } from '@angular/router';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'front';
+  isSubmenuOpen = false;
+
+  toggleSubmenu(): void {
+    this.isSubmenuOpen = !this.isSubmenuOpen;
+  }
+
+  keepSubmenuOpen(event: Event): void {
+    event.stopPropagation();
+  }
 }
