@@ -17,7 +17,8 @@ export class AgregarProductoComponent {
     nombre: '',
     descripcion: '',
     precio: 0,
-    stock: 1
+    stock: 1,
+    umbral: 1
   };
 
   errorMessage: string = '';
@@ -85,7 +86,8 @@ export class AgregarProductoComponent {
       nombre: '',
       descripcion: '',
       precio: 0,
-      stock: 1
+      stock: 1,
+      umbral: 1
     };
   }
 }

@@ -23,6 +23,7 @@
             <i [class]="ordenAscendente ? 'fas fa-sort-numeric-down' : 'fas fa-sort-numeric-up'"></i>
           </button>
         </th>
+        <th>Umbral</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -38,7 +39,12 @@
         <td>{{ producto.nombre }}</td>
         <td>{{ producto.descripcion }}</td>
         <td>{{ producto.precio }} €</td>
-        <td>{{ producto.stock }}</td>
+        <td>
+          {{ producto.stock }}
+          <!-- Mostrar advertencia si el stock es menor que el umbral -->
+          <span *ngIf="verificarStockPorUmbral(producto.stock, producto.umbral)" class="warning">¡Stock bajo!</span>
+        </td>
+        <td>{{ producto.umbral }}</td>
         <td>
           <button (click)="eliminarProducto(producto.id)" aria-label="Eliminar producto"
             class="action-button delete-button">

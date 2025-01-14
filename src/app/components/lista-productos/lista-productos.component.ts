@@ -28,7 +28,7 @@ export class ListaProductosComponent implements OnInit {
       nombre: ['', Validators.required],
       descripcion: [''],
       precio: ['', [Validators.required, Validators.min(0)]],
-      stock: ['', [Validators.required, Validators.min(0)]]
+      stock: ['', [Validators.required, Validators.min(1)]]
     });
   }
 
@@ -143,6 +143,11 @@ export class ListaProductosComponent implements OnInit {
       return this.ordenAscendente ? a.stock - b.stock : b.stock - a.stock;
     });
     this.ordenAscendente = !this.ordenAscendente;
+  }
+
+  // Método para comprobar si el stock es menor que el umbral
+  verificarStockPorUmbral(stock: number, umbral: number): boolean {
+    return stock < umbral;
   }
 
 }
