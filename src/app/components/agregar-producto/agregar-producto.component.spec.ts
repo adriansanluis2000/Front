@@ -34,7 +34,8 @@ describe('AgregarProductoComponent', () => {
         nombre: 'Producto Test',
         descripcion: 'Descripción Test',
         precio: 100,
-        stock: 10
+        stock: 10,
+        umbral: 10
       };
 
       productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
@@ -81,7 +82,8 @@ describe('AgregarProductoComponent', () => {
         nombre: 'Producto Duplicado',
         descripcion: 'Descripción Duplicado',
         precio: 100,
-        stock: 10
+        stock: 10,
+        umbral: 10
       };
 
       productoServiceMock.verificarNombreProducto.and.returnValue(of(true));
@@ -102,7 +104,8 @@ describe('AgregarProductoComponent', () => {
         nombre: 'Producto Único',
         descripcion: 'Descripción Única',
         precio: 100,
-        stock: 10
+        stock: 10,
+        umbral: 10
       };
 
       productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
@@ -131,7 +134,8 @@ describe('AgregarProductoComponent', () => {
         nombre: 'Producto Test',
         descripcion: 'Descripción Test',
         precio: -50,
-        stock: 10
+        stock: 10,
+        umbral: 10
       };
 
       const form: NgForm = {
@@ -152,6 +156,7 @@ describe('AgregarProductoComponent', () => {
         descripcion: 'Descripción Test',
         precio: 100,
         stock: 0,
+        umbral: 0
       };
 
       const form: NgForm = {
@@ -165,13 +170,56 @@ describe('AgregarProductoComponent', () => {
     });
   });
 
+  describe('Prueba de umbral negativo o 0', () => {
+    it('Debería mostrar un mensaje de error si el umbral es menor o igual a 0', () => {
+      component.producto = {
+        nombre: 'Producto Test',
+        descripcion: 'Descripción Test',
+        precio: 100,
+        stock: 10,
+        umbral: 0
+      };
+
+      const form: NgForm = {
+        valid: false,
+        controls: {},
+        resetForm: () => { }
+      } as unknown as NgForm;
+
+      component.agregarProducto(form);
+      expect(component.errorMessage).toBe('El umbral mínimo debe ser mayor que 0.');
+    });
+  });
+
+  describe('Prueba de umbral mayor que stock', () => {
+    it('Debería mostrar un mensaje de error si el umbral es menor o igual a 0', () => {
+      component.producto = {
+        nombre: 'Producto Test',
+        descripcion: 'Descripción Test',
+        precio: 100,
+        stock: 10,
+        umbral: 20
+      };
+
+      const form: NgForm = {
+        valid: false,
+        controls: {},
+        resetForm: () => { }
+      } as unknown as NgForm;
+
+      component.agregarProducto(form);
+      expect(component.errorMessage).toBe('El umbral mínimo no puede superar la cantidad en stock.');
+    });
+  });
+
   describe('Fallo en la base de datos', () => {
     it('Debería mostrar un mensaje de error en caso de fallo de base de datos', () => {
       component.producto = {
         nombre: 'Producto Test',
         descripcion: 'Descripción Test',
         precio: 100,
-        stock: 10
+        stock: 10,
+        umbral: 10
       };
 
       productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
@@ -195,7 +243,8 @@ describe('AgregarProductoComponent', () => {
         nombre: 'Producto Test',
         descripcion: 'Descripción Test',
         precio: 100,
-        stock: 10
+        stock: 10,
+        umbral: 10
       };
 
       productoServiceMock.verificarNombreProducto.and.returnValue(of(false));

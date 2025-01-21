@@ -35,7 +35,6 @@
         <div *ngIf="umbral.invalid && umbral.touched" class="error">
             <div *ngIf="umbral.errors?.['required']">El umbral es obligatorio.</div>
             <div *ngIf="umbral.errors?.['min']">El umbral mínimo debe ser mayor que 0.</div>
-            <div *ngIf="umbral.errors?.['max']">El umbral mínimo no puede superar la cantidad en stock.</div>
         </div>
 
         <div *ngIf="errorMessage" class="error-message">
