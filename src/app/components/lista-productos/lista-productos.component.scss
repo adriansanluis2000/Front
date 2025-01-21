@@ -6,6 +6,20 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+.search-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+}
+
+.search-input {
+  width: 20%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
 .modal {
   .modal-content {
     .modal-header {
@@ -79,4 +93,33 @@
   color: red;
   font-weight: bold;
   margin-top: 5px;
+}
+
+.filter-box {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+}
+
+.stock-filters {
+  display: flex;
+  gap: 1em;
+
+  button {
+    background-color: $color-secondary;
+    border: 1px solid $azul-claro;
+    color: $color-primary;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover {
+      background-color: $azul-claro;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    &.active {
+      background-color: $azul-oscuro;
+      color: $color-text;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    }
+  }
 }

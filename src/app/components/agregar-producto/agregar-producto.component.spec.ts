@@ -192,7 +192,7 @@ describe('AgregarProductoComponent', () => {
   });
 
   describe('Prueba de umbral mayor que stock', () => {
-    it('Debería mostrar un mensaje de error si el umbral es menor o igual a 0', () => {
+    it('Debería mostrar un mensaje de error si el umbral es mayor que el stock', () => {
       component.producto = {
         nombre: 'Producto Test',
         descripcion: 'Descripción Test',

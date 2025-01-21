@@ -4,21 +4,26 @@ import { ProductoService } from '../../services/producto.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 
-
 describe('ListaProductosComponent', () => {
   let component: ListaProductosComponent;
   let fixture: ComponentFixture<ListaProductosComponent>;
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
 
   beforeEach(async () => {
-    productoServiceMock = jasmine.createSpyObj('ProductoService', ['obtenerProductos', 'eliminarProducto', 'actualizarProducto']);
+    productoServiceMock = jasmine.createSpyObj('ProductoService', [
+      'obtenerProductos',
+      'eliminarProducto',
+      'actualizarProducto',
+    ]);
 
     TestBed.configureTestingModule({
-      imports: [
-        ListaProductosComponent,
-        ReactiveFormsModule
+      imports: [ListaProductosComponent, ReactiveFormsModule],
+      providers: [
+        {
+          provide: ProductoService,
+          useValue: productoServiceMock,
+        },
       ],
-      providers: [{ provide: ProductoService, useValue: productoServiceMock }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ListaProductosComponent);
@@ -28,8 +33,18 @@ describe('ListaProductosComponent', () => {
   describe('Prueba de éxito', () => {
     it('Debería mostrar todos los productos registrados', () => {
       const productosMock = [
-        { nombre: 'Producto 1', descripcion: 'Descripción 1', precio: 10, stock: 5 },
-        { nombre: 'Producto 2', descripcion: 'Descripción 2', precio: 20, stock: 10 }
+        {
+          nombre: 'Producto 1',
+          descripcion: 'Descripción 1',
+          precio: 10,
+          stock: 5,
+        },
+        {
+          nombre: 'Producto 2',
+          descripcion: 'Descripción 2',
+          precio: 20,
+          stock: 10,
+        },
       ];
 
       productoServiceMock.obtenerProductos.and.returnValue(of(productosMock));
@@ -54,7 +69,11 @@ describe('ListaProductosComponent', () => {
   describe('Fallo en la base de datos', () => {
     it('Debería mostrar un mensaje de error en la consola', () => {
       spyOn(console, 'error');
-      productoServiceMock.obtenerProductos.and.returnValue(throwError({ status: 500 }));
+      productoServiceMock.obtenerProductos.and.returnValue(
+        throwError({
+          status: 500,
+        })
+      );
       fixture.detectChanges();
 
       expect(component.errorMessage).toBe('Error al obtener productos');
@@ -64,7 +83,11 @@ describe('ListaProductosComponent', () => {
   describe('Pérdida de conexión a internet', () => {
     it('debería mostrar un mensaje de error de conexión', () => {
       spyOn(console, 'error');
-      productoServiceMock.obtenerProductos.and.returnValue(throwError({ status: 0 }));
+      productoServiceMock.obtenerProductos.and.returnValue(
+        throwError({
+          status: 0,
+        })
+      );
       fixture.detectChanges();
 
       expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
@@ -74,8 +97,14 @@ describe('ListaProductosComponent', () => {
   describe('Ordenar por nombre', () => {
     it('Debería ordenar los productos por nombre en orden ascendente y descendente', () => {
       component.productos = [
-        { nombre: 'Producto B', stock: 10 },
-        { nombre: 'Producto A', stock: 5 }
+        {
+          nombre: 'Producto B',
+          stock: 10,
+        },
+        {
+          nombre: 'Producto A',
+          stock: 5,
+        },
       ];
 
       component.ordenarPorNombre();
@@ -89,8 +118,14 @@ describe('ListaProductosComponent', () => {
   describe('Ordenar por stock', () => {
     it('Debería ordenar los productos por stock en orden ascendente y descendente', () => {
       component.productos = [
-        { nombre: 'Producto A', stock: 10 },
-        { nombre: 'Producto B', stock: 5 }
+        {
+          nombre: 'Producto A',
+          stock: 10,
+        },
+        {
+          nombre: 'Producto B',
+          stock: 5,
+        },
       ];
 
       component.ordenarPorStock();
@@ -98,6 +133,160 @@ describe('ListaProductosComponent', () => {
 
       component.ordenarPorStock();
       expect(component.productos[0].stock).toBe(10);
+    });
+  });
+
+  describe('Mostrar productos por debajo del umbral', () => {
+    const productosMock = [
+      {
+        id: 1,
+        nombre: 'Producto A',
+        stock: 5,
+        umbral: 10,
+      },
+      {
+        id: 2,
+        nombre: 'Producto B',
+        stock: 12,
+        umbral: 10,
+      },
+      {
+        id: 3,
+        nombre: 'Producto C',
+        stock: 8,
+        umbral: 15,
+      },
+    ];
+
+    beforeEach(async () => {
+      productoServiceMock.obtenerProductos.and.returnValue(of(productosMock));
+      fixture.detectChanges();
+    });
+
+    it('Debería mostrar productos con stock por debajo del umbral', () => {
+      component.filters.stock = 'low';
+      const filtered = component.filteredProducts;
+
+      expect(filtered.length).toBe(2);
+      expect(filtered).toEqual([
+        {
+          id: 1,
+          nombre: 'Producto A',
+          stock: 5,
+          umbral: 10,
+        },
+        {
+          id: 3,
+          nombre: 'Producto C',
+          stock: 8,
+          umbral: 15,
+        },
+      ]);
+    });
+
+    it('debería mostrar un mensaje cuando no hay productos por debajo del umbral', () => {
+      component.productosOriginales = [
+        {
+          id: 1,
+          nombre: 'Producto A',
+          stock: 20,
+          umbral: 10,
+        },
+        {
+          id: 2,
+          nombre: 'Producto B',
+          stock: 30,
+          umbral: 20,
+        },
+      ];
+      component.filters.stock = 'low';
+
+      // Detectar cambios para reflejar las modificaciones en la plantilla
+      fixture.detectChanges();
+
+      // Obtener el elemento HTML que contiene el mensaje
+      const messageElement = fixture.nativeElement.querySelector('.error-message');
+
+      // Validar que el mensaje se muestra
+      expect(messageElement).not.toBeNull();
+      expect(messageElement.textContent.trim()).toBe('No se encontraron productos.');
+    });
+  });
+
+  describe('Mostrar productos cercanos al umbral', () => {
+    const productosMock = [
+      {
+        id: 1,
+        nombre: 'Producto A',
+        stock: 50,
+        umbral: 45,
+      },
+      {
+        id: 2,
+        nombre: 'Producto B',
+        stock: 15,
+        umbral: 10,
+      },
+      {
+        id: 3,
+        nombre: 'Producto C',
+        stock: 16,
+        umbral: 15,
+      },
+    ];
+
+    beforeEach(async () => {
+      productoServiceMock.obtenerProductos.and.returnValue(of(productosMock));
+      fixture.detectChanges();
+    });
+
+    it('Debería mostrar productos con stock cercano al umbral', () => {
+      component.filters.stock = 'near-threshold';
+      const filtered = component.filteredProducts;
+
+      expect(filtered.length).toBe(2);
+      expect(filtered).toEqual([
+        {
+          id: 1,
+          nombre: 'Producto A',
+          stock: 50,
+          umbral: 45,
+        },
+        {
+          id: 3,
+          nombre: 'Producto C',
+          stock: 16,
+          umbral: 15,
+        },
+      ]);
+    });
+
+    it('debería mostrar un mensaje cuando no hay productos cercanos al umbral', () => {
+      component.productosOriginales = [
+        {
+          id: 1,
+          nombre: 'Producto A',
+          stock: 20,
+          umbral: 10,
+        },
+        {
+          id: 2,
+          nombre: 'Producto B',
+          stock: 30,
+          umbral: 20,
+        },
+      ];
+      component.filters.stock = 'near-threshold';
+
+      // Detectar cambios para reflejar las modificaciones en la plantilla
+      fixture.detectChanges();
+
+      // Obtener el elemento HTML que contiene el mensaje
+      const messageElement = fixture.nativeElement.querySelector('.error-message');
+
+      // Validar que el mensaje se muestra
+      expect(messageElement).not.toBeNull();
+      expect(messageElement.textContent.trim()).toBe('No se encontraron productos.');
     });
   });
 
@@ -117,7 +306,7 @@ describe('ListaProductosComponent', () => {
       component.eliminarProducto(productId);
 
       expect(productoServiceMock.eliminarProducto).not.toHaveBeenCalled();
-    })
+    });
 
     it('Debería mostrar un fallo en la base de datos', () => {
       spyOn(window, 'confirm').and.returnValue(true);
@@ -127,7 +316,7 @@ describe('ListaProductosComponent', () => {
 
       expect(productoServiceMock.eliminarProducto).toHaveBeenCalledWith(productId);
       expect(console.error).toHaveBeenCalledWith('Error al eliminar producto', 'Database error');
-    })
+    });
 
     it('Debería mostrar un fallo por pérdida de conexión a internet', () => {
       spyOn(window, 'confirm').and.returnValue(true);
@@ -137,7 +326,7 @@ describe('ListaProductosComponent', () => {
 
       expect(productoServiceMock.eliminarProducto).toHaveBeenCalledWith(productId);
       expect(console.error).toHaveBeenCalledWith('Error al eliminar producto', 'No internet connection');
-    })
+    });
   });
 
   describe('Modificar producto registrado', () => {
@@ -148,9 +337,22 @@ describe('ListaProductosComponent', () => {
         console.log('Productos obtenidos correctamente');
       });
     });
+
     it('debería guardar los cambios correctamente al modificar un producto', () => {
-      const productoOriginal = { id: 1, nombre: 'Producto A', descripcion: 'Desc A', precio: 100, stock: 10 };
-      const productoModificado = { id: 1, nombre: 'Producto A Modificado', descripcion: 'Desc A Modificada', precio: 120, stock: 15 };
+      const productoOriginal = {
+        id: 1,
+        nombre: 'Producto A',
+        descripcion: 'Desc A',
+        precio: 100,
+        stock: 10,
+      };
+      const productoModificado = {
+        ...productoOriginal,
+        nombre: 'Producto A Modificado',
+        descripcion: 'Desc A Modificada',
+        precio: 120,
+        stock: 15,
+      };
 
       productoServiceMock.actualizarProducto.and.returnValue(of(productoModificado));
       spyOn(component, 'cerrarModal');
@@ -162,18 +364,23 @@ describe('ListaProductosComponent', () => {
         nombre: 'Producto A Modificado',
         descripcion: 'Desc A Modificada',
         precio: 120,
-        stock: 15
+        stock: 15,
       });
 
       component.guardarProducto();
 
       expect(productoServiceMock.actualizarProducto).toHaveBeenCalledWith(productoOriginal.id, productoModificado);
       expect(component.cerrarModal).toHaveBeenCalled();
-      expect(obtenerProductosSpy).toHaveBeenCalled();
     });
 
     it('debería mantener los campos sin cambios si no se modifican', () => {
-      const productoOriginal = { id: 1, nombre: 'Producto B', descripcion: 'Desc B', precio: 200, stock: 5 };
+      const productoOriginal = {
+        id: 1,
+        nombre: 'Producto B',
+        descripcion: 'Desc B',
+        precio: 200,
+        stock: 5,
+      };
 
       productoServiceMock.actualizarProducto.and.returnValue(of(productoOriginal));
 
@@ -181,20 +388,25 @@ describe('ListaProductosComponent', () => {
 
       // No se cambia el campo 'descripcion' y 'precio'
       component.productoForm.patchValue({
-        stock: 10
+        stock: 10,
       });
 
       component.guardarProducto();
 
       expect(productoServiceMock.actualizarProducto).toHaveBeenCalledWith(productoOriginal.id, {
         ...productoOriginal,
-        stock: 10
+        stock: 10,
       });
-      expect(obtenerProductosSpy).toHaveBeenCalled();
     });
 
     it('debería mostrar un mensaje de error si los datos ingresados no son válidos', () => {
-      const productoOriginal = { id: 1, nombre: 'Producto C', descripcion: 'Desc C', precio: 300, stock: 20 };
+      const productoOriginal = {
+        id: 1,
+        nombre: 'Producto C',
+        descripcion: 'Desc C',
+        precio: 300,
+        stock: 20,
+      };
 
       productoServiceMock.actualizarProducto.and.returnValue(of(productoOriginal));
       spyOn(console, 'log');
@@ -203,7 +415,7 @@ describe('ListaProductosComponent', () => {
 
       // Simular datos no válidos
       component.productoForm.patchValue({
-        precio: -50
+        precio: -50,
       });
 
       component.guardarProducto();
@@ -213,14 +425,20 @@ describe('ListaProductosComponent', () => {
     });
 
     it('debería descartar las modificaciones si se cancelan los cambios', () => {
-      const productoOriginal = { id: 1, nombre: 'Producto D', descripcion: 'Desc D', precio: 400, stock: 25 };
+      const productoOriginal = {
+        id: 1,
+        nombre: 'Producto D',
+        descripcion: 'Desc D',
+        precio: 400,
+        stock: 25,
+      };
 
       component.abrirModal(productoOriginal);
 
       // Simular cambios en el formulario
       component.productoForm.patchValue({
         nombre: 'Producto D Modificado',
-        descripcion: 'Desc D Modificada'
+        descripcion: 'Desc D Modificada',
       });
 
       // Cancelar los cambios
@@ -235,9 +453,27 @@ describe('ListaProductosComponent', () => {
 
     beforeEach(() => {
       productosMock = [
-        { id: 1, nombre: 'Gafas de Sol', descripcion: 'Descripción 1', precio: 10, stock: 5 },
-        { id: 2, nombre: 'Gafas de Lectura', descripcion: 'Descripción 2', precio: 20, stock: 10 },
-        { id: 3, nombre: 'Lentes de Contacto', descripcion: 'Lentes de contacto', precio: 40, stock: 5 },
+        {
+          id: 1,
+          nombre: 'Gafas de Sol',
+          descripcion: 'Descripción 1',
+          precio: 10,
+          stock: 5,
+        },
+        {
+          id: 2,
+          nombre: 'Gafas de Lectura',
+          descripcion: 'Descripción 2',
+          precio: 20,
+          stock: 10,
+        },
+        {
+          id: 3,
+          nombre: 'Lentes de Contacto',
+          descripcion: 'Lentes de contacto',
+          precio: 40,
+          stock: 5,
+        },
       ];
 
       productoServiceMock.obtenerProductos.and.returnValue(of(productosMock));

@@ -4,6 +4,17 @@
   <div class="search-container">
     <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrarProductos()" placeholder="Buscar producto..."
       class="search-input" />
+
+    <div class="filter-box">
+      <div class="stock-filters">
+        <button (click)="setStockFilter('low')" [class.active]="filters.stock === 'low'">
+          Mostrar productos con stock bajo
+        </button>
+        <button (click)="setStockFilter('near-threshold')" [class.active]="filters.stock === 'near-threshold'">
+          Mostrar productos cercanos al umbral
+        </button>
+      </div>
+    </div>
   </div>
 
   <table>
@@ -30,12 +41,12 @@
 
     <tbody>
       <!-- Mostrar mensaje si no hay productos -->
-      <tr *ngIf="productos.length === 0">
-        <td colspan="5" class="error-message">
+      <tr *ngIf="filteredProducts.length === 0">
+        <td colspan="6" class="error-message">
           <p>No se encontraron productos.</p>
         </td>
       </tr>
-      <tr *ngFor="let producto of productos">
+      <tr *ngFor="let producto of filteredProducts">
         <td>{{ producto.nombre }}</td>
         <td>{{ producto.descripcion }}</td>
         <td>{{ producto.precio }} €</td>
