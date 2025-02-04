@@ -15,6 +15,7 @@ describe('RegistrarPedidoSalienteComponent', () => {
   beforeEach(async () => {
     pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['registrarPedido']);
     productoServiceMock = jasmine.createSpyObj('ProductoService', ['obtenerProductos']);
+    activatedRouteMock = {};
 
     await TestBed.configureTestingModule({
       imports: [RegistrarPedidoSalienteComponent],
