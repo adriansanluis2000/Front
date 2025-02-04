@@ -24,7 +24,6 @@ export class PedidoService {
     return this.http.get(this.apiUrl, { params });
   }
   
-
   eliminarPedido(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
@@ -36,4 +35,8 @@ export class PedidoService {
   actualizarPedido(id: number, datosPedido: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, datosPedido);
   }
+
+  devolverStock(id: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/devolver-stock/${id}`, {});
+  }  
 }

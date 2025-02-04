@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [NgFor, NgIf, DatePipe, FormsModule],
   templateUrl: './historial-pedidos-entrantes.component.html',
-  styleUrl: './historial-pedidos-entrantes.component.scss'
+  styleUrl: './historial-pedidos-entrantes.component.scss',
 })
 export class HistorialPedidosEntrantesComponent implements OnInit {
   pedidos: Pedido[] = [];
@@ -20,10 +20,7 @@ export class HistorialPedidosEntrantesComponent implements OnInit {
   errorMessage: string = '';
   errorBusqueda: string = '';
 
-  constructor(
-    private readonly pedidoService: PedidoService,
-    private readonly router: Router
-  ) { }
+  constructor(private readonly pedidoService: PedidoService, private readonly router: Router) {}
 
   ngOnInit(): void {
     this.obtenerHistorial();
@@ -47,9 +44,9 @@ export class HistorialPedidosEntrantesComponent implements OnInit {
         if (e.status === 0) {
           this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
         } else {
-          this.errorMessage = 'Error al obtener el historial de pedidos. Por favor, inténtalo de nuevo más tarde.'
+          this.errorMessage = 'Error al obtener el historial de pedidos. Por favor, inténtalo de nuevo más tarde.';
         }
-      }
+      },
     });
   }
 
@@ -67,17 +64,16 @@ export class HistorialPedidosEntrantesComponent implements OnInit {
     const terminos = this.busqueda.trim().toLowerCase();
 
     // Filtrar solo si hay términos de búsqueda
-    this.pedidos = terminos ? this.pedidosOriginales.filter(pedido =>
-      pedido.id.toString().includes(terminos)
-    ) : [...this.pedidosOriginales];
+    this.pedidos = terminos
+      ? this.pedidosOriginales.filter((pedido) => pedido.id.toString().includes(terminos))
+      : [...this.pedidosOriginales];
 
     // Verificar si no hay resultados
     this.errorMessage = this.pedidos.length === 0 ? 'No se encontraron pedidos.' : '';
   }
 
-
   verDetallesPedido(id: number): void {
-    this.pedidoSeleccionado = this.pedidos.find(pedido => pedido.id === id) || null;
+    this.pedidoSeleccionado = this.pedidos.find((pedido) => pedido.id === id) || null;
   }
 
   editarPedido(pedidoId: number) {
@@ -90,21 +86,46 @@ export class HistorialPedidosEntrantesComponent implements OnInit {
 
   eliminarPedido(id: number): void {
     const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar este pedido?');
-    if (confirmacion) {
-      if (!navigator.onLine) {
-        this.errorMessage = 'No se pudo eliminar el pedido debido a una pérdida de conexión. Verifica tu conexión e inténtalo de nuevo.';
-        return;
-      }
-      this.pedidoService.eliminarPedido(id).subscribe({
+
+    if (!confirmacion) {
+      return;
+    }
+
+    const devolverStock = window.confirm(
+      '¿Quieres devolver las unidades de los productos de este pedido al inventario?'
+    );
+
+    if (!navigator.onLine) {
+      this.errorMessage =
+        'No se pudo eliminar el pedido debido a una pérdida de conexión. Verifica tu conexión e inténtalo de nuevo.';
+      return;
+    }
+
+    if (devolverStock) {
+      this.pedidoService.devolverStock(id).subscribe({
         next: () => {
-          this.pedidos = this.pedidos.filter(pedido => pedido.id !== id);
-          this.errorMessage = '';
+          this.eliminarPedidoFinal(id);
         },
         error: (error) => {
-          console.error('Error al eliminar pedido', error);
-          this.errorMessage = 'Error al eliminar pedido: ' + (error.error || 'Error desconocido');
-        }
+          console.error('Error al devolver stock', error);
+          this.errorMessage = 'Error al devolver stock: ' + (error.error || 'Error desconocido');
+        },
       });
+    } else {
+      this.eliminarPedidoFinal(id);
     }
+  }
+
+  private eliminarPedidoFinal(id: number): void {
+    this.pedidoService.eliminarPedido(id).subscribe({
+      next: () => {
+        this.pedidos = this.pedidos.filter((pedido) => pedido.id !== id);
+        this.errorMessage = '';
+      },
+      error: (error) => {
+        console.error('Error al eliminar pedido', error);
+        this.errorMessage = 'Error al eliminar pedido: ' + (error.error || 'Error desconocido');
+      },
+    });
   }
 }
