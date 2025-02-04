@@ -330,14 +330,6 @@ describe('ListaProductosComponent', () => {
   });
 
   describe('Modificar producto registrado', () => {
-    let obtenerProductosSpy: jasmine.Spy;
-
-    beforeEach(() => {
-      obtenerProductosSpy = spyOn(component, 'obtenerProductos').and.callFake(() => {
-        console.log('Productos obtenidos correctamente');
-      });
-    });
-
     it('debería guardar los cambios correctamente al modificar un producto', () => {
       const productoOriginal = {
         id: 1,
