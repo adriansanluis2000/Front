@@ -164,8 +164,8 @@ describe('ListaProductosComponent', () => {
     });
 
     it('Debería mostrar productos con stock por debajo del umbral', () => {
-      component.filters.stock = 'low';
-      const filtered = component.filteredProducts;
+      component.setStockFilter('low');
+      const filtered = component.productosFiltrados;
 
       expect(filtered.length).toBe(2);
       expect(filtered).toEqual([
@@ -185,7 +185,7 @@ describe('ListaProductosComponent', () => {
     });
 
     it('debería mostrar un mensaje cuando no hay productos por debajo del umbral', () => {
-      component.productosOriginales = [
+      component.productos = [
         {
           id: 1,
           nombre: 'Producto A',
@@ -199,7 +199,7 @@ describe('ListaProductosComponent', () => {
           umbral: 20,
         },
       ];
-      component.filters.stock = 'low';
+      component.setStockFilter('low');
 
       // Detectar cambios para reflejar las modificaciones en la plantilla
       fixture.detectChanges();
@@ -241,8 +241,8 @@ describe('ListaProductosComponent', () => {
     });
 
     it('Debería mostrar productos con stock cercano al umbral', () => {
-      component.filters.stock = 'near-threshold';
-      const filtered = component.filteredProducts;
+      component.setStockFilter('near-threshold');
+      const filtered = component.productosFiltrados;
 
       expect(filtered.length).toBe(2);
       expect(filtered).toEqual([
@@ -262,7 +262,7 @@ describe('ListaProductosComponent', () => {
     });
 
     it('debería mostrar un mensaje cuando no hay productos cercanos al umbral', () => {
-      component.productosOriginales = [
+      component.productos = [
         {
           id: 1,
           nombre: 'Producto A',
@@ -276,7 +276,7 @@ describe('ListaProductosComponent', () => {
           umbral: 20,
         },
       ];
-      component.filters.stock = 'near-threshold';
+      component.setStockFilter('near-threshold');
 
       // Detectar cambios para reflejar las modificaciones en la plantilla
       fixture.detectChanges();
@@ -480,27 +480,27 @@ describe('ListaProductosComponent', () => {
     it('debería mostrar productos que coinciden con el nombre buscado', () => {
       component.busqueda = 'Gafas';
       component.filtrarProductos();
-      expect(component.productos.length).toBe(2);
+      expect(component.productosFiltrados.length).toBe(2);
     });
 
     it('debería mostrar mensaje de búsqueda sin resultados', () => {
       component.busqueda = 'No Existe';
       component.filtrarProductos();
-      expect(component.productos.length).toBe(0);
+      expect(component.productosFiltrados.length).toBe(0);
       expect(component.errorMessage).toBe('No se encontraron productos.');
     });
 
     it('debería mostrar productos con búsqueda parcial', () => {
       component.busqueda = 'Sol';
       component.filtrarProductos();
-      expect(component.productos.length).toBe(1);
+      expect(component.productosFiltrados.length).toBe(1);
       expect(component.productos[0].nombre).toContain('Sol');
     });
 
     it('debería mostrar productos con búsqueda múltiple', () => {
       component.busqueda = 'Gafas Sol';
       component.filtrarProductos();
-      expect(component.productos.length).toBe(1);
+      expect(component.productosFiltrados.length).toBe(1);
       expect(component.productos[0].nombre).toContain('Gafas');
     });
   });
