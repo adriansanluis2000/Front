@@ -36,7 +36,7 @@ export class PedidoService {
     return this.http.put(`${this.apiUrl}/${id}`, datosPedido);
   }
 
-  devolverStock(id: number): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/devolver-stock/${id}`, {});
+  devolverStock(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/devolver-stock/${id}`, {});
   }  
 }

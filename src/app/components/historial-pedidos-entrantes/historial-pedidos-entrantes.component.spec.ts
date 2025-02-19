@@ -11,31 +11,38 @@ describe('HistorialPedidosEntrantesComponent', () => {
 
   const pedidosMock = [
     {
-      id: 1, fecha: '2024-11-12T10:00:00', precioTotal: 100, estado: 'Enviado', tipo: 'entrante', Productos: [
-        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
-      ]
+      id: 1,
+      fecha: '2024-11-12T10:00:00',
+      precioTotal: 100,
+      estado: 'Enviado',
+      tipo: 'entrante',
+      Productos: [{ id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }],
     },
     {
-      id: 2, fecha: '2024-11-11T15:00:00', precioTotal: 50, estado: 'Enviado', tipo: 'entrante', Productos: [
-        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
-      ]
+      id: 2,
+      fecha: '2024-11-11T15:00:00',
+      precioTotal: 50,
+      estado: 'Enviado',
+      tipo: 'entrante',
+      Productos: [{ id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }],
     },
     {
-      id: 3, fecha: '2024-11-10T09:00:00', precioTotal: 200, estado: 'Enviado', tipo: 'entrante', Productos: [
-        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
-      ]
+      id: 3,
+      fecha: '2024-11-10T09:00:00',
+      precioTotal: 200,
+      estado: 'Enviado',
+      tipo: 'entrante',
+      Productos: [{ id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }],
     },
   ];
 
   beforeEach(async () => {
-    pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['obtenerHistorialPedidos', 'eliminarPedido']);
+    pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['obtenerHistorialPedidos', 'eliminarPedido', 'devolverStock']);
 
     await TestBed.configureTestingModule({
       imports: [HistorialPedidosEntrantesComponent],
-      providers: [
-        { provide: PedidoService, useValue: pedidoServiceMock }
-      ],
-      schemas: [NO_ERRORS_SCHEMA] // Para evitar errores con elementos HTML no reconocidos
+      providers: [{ provide: PedidoService, useValue: pedidoServiceMock }],
+      schemas: [NO_ERRORS_SCHEMA], // Para evitar errores con elementos HTML no reconocidos
     }).compileComponents();
 
     fixture = TestBed.createComponent(HistorialPedidosEntrantesComponent);
@@ -44,7 +51,6 @@ describe('HistorialPedidosEntrantesComponent', () => {
 
   describe('Prueba de éxito', () => {
     it('debe mostrar los pedidos ordenados de más reciente a más antiguo', () => {
-
       // Mock de los pedidos devueltos por el servicio
       pedidoServiceMock.obtenerHistorialPedidos.and.returnValue(of(pedidosMock));
       component.obtenerHistorial();
@@ -56,7 +62,7 @@ describe('HistorialPedidosEntrantesComponent', () => {
       expect(dateCells[1].textContent).toContain('11/11/2024 15:00');
       expect(dateCells[2].textContent).toContain('10/11/2024 09:00');
     });
-  })
+  });
 
   describe('Pruebas de error', () => {
     it('debe mostrar un mensaje indicando que no se encontraron pedidos si la lista está vacía', () => {
@@ -79,22 +85,21 @@ describe('HistorialPedidosEntrantesComponent', () => {
       expect(pedidoServiceMock.obtenerHistorialPedidos).toHaveBeenCalled();
       expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
     });
-  })
-
+  });
 
   describe('Ver detalles', () => {
     describe('Prueba de éxito', () => {
       it('debe mostrar los detalles del pedido cuando el usuario selecciona un pedido', () => {
-        pedidoServiceMock.obtenerHistorialPedidos.and.returnValue(of([
-          {
-            id: 1,
-            fecha: new Date(),
-            precioTotal: 100,
-            Productos: [
-              { nombre: 'Gafas', precio: 50, PedidoProducto: { cantidad: 2 } }
-            ]
-          }
-        ]));
+        pedidoServiceMock.obtenerHistorialPedidos.and.returnValue(
+          of([
+            {
+              id: 1,
+              fecha: new Date(),
+              precioTotal: 100,
+              Productos: [{ nombre: 'Gafas', precio: 50, PedidoProducto: { cantidad: 2 } }],
+            },
+          ])
+        );
 
         component.obtenerHistorial();
         fixture.detectChanges();
@@ -118,7 +123,7 @@ describe('HistorialPedidosEntrantesComponent', () => {
         const precioTotal = fixture.nativeElement.querySelector('.detalles-pedido p:nth-of-type(2)');
         expect(precioTotal.textContent).toContain('100€');
       });
-    })
+    });
 
     describe('Prueba de error', () => {
       it('debe mostrar un mensaje de error cuando no se puede obtener el historial de pedidos', () => {
@@ -131,9 +136,8 @@ describe('HistorialPedidosEntrantesComponent', () => {
         expect(errorMessage).toBeTruthy();
         expect(errorMessage.textContent).toContain('No se encontraron pedidos');
       });
-    })
-  })
-
+    });
+  });
 
   describe('Eliminar pedido', () => {
     const pedidoId = 1;
@@ -145,12 +149,25 @@ describe('HistorialPedidosEntrantesComponent', () => {
     });
 
     describe('Prueba de éxito', () => {
-      it('debe eliminar el pedido correctamente y actualizar la lista', () => {
-        spyOn(window, 'confirm').and.returnValue(true);
+      it('debe eliminar el pedido correctamente y actualizar la lista cuando se devuelve stock', () => {
+        spyOn(window, 'confirm').and.returnValues(true, true); // Confirmaciones para eliminar y devolver stock
+        pedidoServiceMock.devolverStock.and.returnValue(of({}));
         pedidoServiceMock.eliminarPedido.and.returnValue(of({}));
-
+  
         component.eliminarPedido(pedidoId);
-
+  
+        expect(pedidoServiceMock.devolverStock).toHaveBeenCalledWith(pedidoId);
+        expect(pedidoServiceMock.eliminarPedido).toHaveBeenCalledWith(pedidoId);
+        expect(component.pedidos.length).toBe(0);
+      });
+  
+      it('debe eliminar el pedido correctamente sin devolver stock', () => {
+        spyOn(window, 'confirm').and.returnValues(true, false); // Confirmaciones para eliminar y no devolver stock
+        pedidoServiceMock.eliminarPedido.and.returnValue(of({}));
+  
+        component.eliminarPedido(pedidoId);
+  
+        expect(pedidoServiceMock.devolverStock).not.toHaveBeenCalled();
         expect(pedidoServiceMock.eliminarPedido).toHaveBeenCalledWith(pedidoId);
         expect(component.pedidos.length).toBe(0);
       });
@@ -169,7 +186,7 @@ describe('HistorialPedidosEntrantesComponent', () => {
 
     describe('Fallo en la base de datos', () => {
       it('debe mostrar un mensaje de error cuando ocurre un fallo en la base de datos', () => {
-        spyOn(window, 'confirm').and.returnValue(true);
+        spyOn(window, 'confirm').and.returnValues(true, false);
         pedidoServiceMock.eliminarPedido.and.returnValue(throwError({ error: 'Error de base de datos' }));
         component.eliminarPedido(pedidoId);
 
@@ -186,10 +203,12 @@ describe('HistorialPedidosEntrantesComponent', () => {
         component.eliminarPedido(pedidoId);
 
         expect(pedidoServiceMock.eliminarPedido).not.toHaveBeenCalled();
-        expect(component.errorMessage).toBe('No se pudo eliminar el pedido debido a una pérdida de conexión. Verifica tu conexión e inténtalo de nuevo.');
+        expect(component.errorMessage).toBe(
+          'No se pudo eliminar el pedido debido a una pérdida de conexión. Verifica tu conexión e inténtalo de nuevo.'
+        );
       });
     });
-  })
+  });
 
   describe('Búsqueda por ID', () => {
     beforeEach(() => {
@@ -204,7 +223,7 @@ describe('HistorialPedidosEntrantesComponent', () => {
         expect(component.pedidos[0].id).toBe(1);
         expect(component.errorMessage).toBe('');
       });
-    })
+    });
 
     describe('Prueba de búsqueda sin resultados', () => {
       it('debería manejar el caso cuando no se encuentran resultados', () => {
@@ -213,7 +232,7 @@ describe('HistorialPedidosEntrantesComponent', () => {
         expect(component.pedidos.length).toBe(0);
         expect(component.errorMessage).toBe('No se encontraron pedidos.');
       });
-    })
+    });
 
     describe('Prueba de error por caracteres no válidos', () => {
       it('debería mostrar un mensaje de error para entradas no válidas', () => {
@@ -222,6 +241,6 @@ describe('HistorialPedidosEntrantesComponent', () => {
         expect(component.pedidos.length).toBe(3);
         expect(component.errorBusqueda).toBe('Número de pedido inválido. Solo se permiten números.');
       });
-    })
-  })
+    });
+  });
 });
