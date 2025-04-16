@@ -45,5 +45,10 @@ export const routes: Routes = [
         path: 'historial-pedidos-salientes',
         loadComponent: () =>
             import('./components/historial-pedidos-salientes/historial-pedidos-salientes.component').then(m => m.HistorialPedidosSalientesComponent)
+    },
+    {
+        path: 'solicitudes-pendientes',
+        loadComponent: () =>
+            import('./components/solicitudes-pendientes/solicitudes-pendientes.component').then(m=> m.SolicitudesPendientesComponent)
     }
 ];

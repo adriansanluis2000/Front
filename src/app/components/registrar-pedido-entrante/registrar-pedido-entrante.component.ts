@@ -6,22 +6,19 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Pedido } from '../../models/pedido.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { SolicitudService } from '../../services/solicitud.service';
 
 @Component({
   selector: 'app-registrar-pedido-entrante',
   standalone: true,
-  imports: [
-    NgFor,
-    NgIf,
-    FormsModule
-  ],
+  imports: [NgFor, NgIf, FormsModule],
   templateUrl: './registrar-pedido-entrante.component.html',
   styleUrls: ['./registrar-pedido-entrante.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class RegistrarPedidoEntranteComponent implements OnInit {
   productos: any[] = [];
-  productosPedido: { producto: any, cantidad: number }[] = [];
+  productosPedido: { producto: any; cantidad: number }[] = [];
   pedidoPendiente: any[] = [];
   pedido: Pedido | null = null;
   errorMessage: string = '';
@@ -31,11 +28,12 @@ export class RegistrarPedidoEntranteComponent implements OnInit {
   constructor(
     private readonly productoService: ProductoService,
     private readonly pedidoService: PedidoService,
+    private readonly solicitudService: SolicitudService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly snackBar: MatSnackBar,
     @Inject(PLATFORM_ID) private readonly platformId: Object
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.cargarProductos();
@@ -56,29 +54,33 @@ export class RegistrarPedidoEntranteComponent implements OnInit {
         this.pedido = pedido;
 
         // Cargar los productos del pedido en productosPedido con tipos explícitos
-        this.productosPedido = pedido.Productos.map((producto: {
-          id: number;
-          nombre: string;
-          precio: number;
-          stock: number;
-          descripcion?: string;
-          PedidoProducto: { cantidad: number; };
-        }) => ({
-          producto: {
-            id: producto.id,
-            nombre: producto.nombre,
-            precio: producto.precio,
-            stock: producto.stock,
-            descripcion: producto.descripcion
-          },
-          cantidad: producto.PedidoProducto.cantidad
-        }));
+        this.productosPedido = pedido.Productos.map(
+          (producto: {
+            id: number;
+            nombre: string;
+            precio: number;
+            stock: number;
+            umbral: number;
+            descripcion?: string;
+            ProductoPedido: { cantidad: number };
+          }) => ({
+            producto: {
+              id: producto.id,
+              nombre: producto.nombre,
+              precio: producto.precio,
+              stock: producto.stock,
+              umbral: producto.umbral,
+              descripcion: producto.descripcion,
+            },
+            cantidad: producto.ProductoPedido.cantidad,
+          })
+        );
       });
     }
   }
 
   cargarProductos(): void {
-    this.productoService.obtenerProductos().subscribe(productos => {
+    this.productoService.obtenerProductos().subscribe((productos) => {
       this.productos = productos;
       this.ordenarProductos();
     });
@@ -89,7 +91,7 @@ export class RegistrarPedidoEntranteComponent implements OnInit {
   }
 
   agregarProducto(producto: any): void {
-    const productoExistente = this.productosPedido.find(item => item.producto.id === producto.id);
+    const productoExistente = this.productosPedido.find((item) => item.producto.id === producto.id);
     if (productoExistente) {
       productoExistente.cantidad++;
     } else {
@@ -97,13 +99,11 @@ export class RegistrarPedidoEntranteComponent implements OnInit {
     }
   }
 
-  quitarProducto(item: { producto: any, cantidad: number }): void {
-    this.productosPedido = this.productosPedido.filter(
-      orderItem => orderItem.producto.id !== item.producto.id
-    );
+  quitarProducto(item: { producto: any; cantidad: number }): void {
+    this.productosPedido = this.productosPedido.filter((orderItem) => orderItem.producto.id !== item.producto.id);
   }
 
-  actualizarProducto(item: { producto: any, cantidad: number }): void {
+  actualizarProducto(item: { producto: any; cantidad: number }): void {
     if (isNaN(item.cantidad) || typeof item.cantidad !== 'number') {
       alert('La cantidad debe ser un número.');
       item.cantidad = 1;
@@ -130,28 +130,37 @@ export class RegistrarPedidoEntranteComponent implements OnInit {
         item.cantidad = 1;
       }
     } else {
-      const index = this.productosPedido.findIndex(p => p.producto.id === item.producto.id);
+      const index = this.productosPedido.findIndex((p) => p.producto.id === item.producto.id);
       if (index !== -1) {
         this.productosPedido[index].cantidad = item.cantidad;
       }
     }
   }
 
-  registrarPedido(): void {
+  registrarPedido(verificado: boolean): void {
     if (!navigator.onLine) {
       this.errorMessage = 'Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.';
-      this.pedidoPendiente = this.productosPedido.map(item => ({ id: item.producto.id, cantidad: item.cantidad }));
+      this.pedidoPendiente = this.productosPedido.map((item) => ({ id: item.producto.id, cantidad: item.cantidad }));
       return;
+    }
+
+    if (!verificado) {
+      const productosBajoStock = this.verificarStockBajo(this.productosPedido);
+
+      if (productosBajoStock.length > 0) {
+        this.mostrarAlertaStockBajo(productosBajoStock);
+        return;
+      }
     }
 
     if (this.actualizarPedido && this.pedido) {
       const datosPedido = {
         fecha: new Date().toISOString(),
-        productos: this.productosPedido.map(item => ({
+        productos: this.productosPedido.map((item) => ({
           id: item.producto.id,
-          cantidad: item.cantidad
+          cantidad: item.cantidad,
         })),
-        tipo: 'entrante'
+        tipo: 'entrante',
       };
 
       this.pedidoService.actualizarPedido(this.pedido.id, datosPedido).subscribe({
@@ -177,17 +186,17 @@ export class RegistrarPedidoEntranteComponent implements OnInit {
             duration: 3000,
             horizontalPosition: 'right',
             verticalPosition: 'top',
-            panelClass: ['snackbar-error']
+            panelClass: ['snackbar-error'],
           });
-        }
+        },
       });
     } else {
       const datosPedido = {
-        productos: this.productosPedido.map(item => ({
+        productos: this.productosPedido.map((item) => ({
           id: item.producto.id,
-          cantidad: item.cantidad
+          cantidad: item.cantidad,
         })),
-        tipo: 'entrante'
+        tipo: 'entrante',
       };
 
       this.pedidoService.registrarPedido(datosPedido).subscribe({
@@ -211,11 +220,66 @@ export class RegistrarPedidoEntranteComponent implements OnInit {
             duration: 3000,
             horizontalPosition: 'right',
             verticalPosition: 'top',
-            panelClass: ['snackbar-error']
+            panelClass: ['snackbar-error'],
           });
-        }
+        },
       });
     }
+  }
+
+  verificarStockBajo(productos: { producto: any; cantidad: number }[]): { producto: any; cantidad: number }[] {
+    return productos.filter((item) => item.producto.stock <= item.producto.umbral + item.cantidad);
+  }
+
+  mostrarAlertaStockBajo(productos: { producto: any; cantidad: number }[]): void {
+    const nombresProductos = productos.map((p) => p.producto.nombre).join(', ');
+
+    const confirmacion = window.confirm(
+      `Los siguientes productos están por debajo del stock mínimo: ${nombresProductos}. ¿Deseas hacer una solicitud de reposición?`
+    );
+    if (confirmacion) {
+      const productosSolicitud: any[] = [];
+      productos.forEach((p) => {
+        const cantidadPedido = window.prompt(
+          `Introduce la cantidad a pedir para ${p.producto.nombre} (déjalo vacío para usar el valor predeterminado)`
+        );
+
+        const cantidadFinal = cantidadPedido ? parseInt(cantidadPedido, 10) : 10; // 10 es el valor predeterminado
+        if (!isNaN(cantidadFinal) && cantidadFinal > 0) {
+          productosSolicitud.push({ id: p.producto.id, cantidad: cantidadFinal });
+        } else {
+          alert('Cantidad inválida. No se realizará el pedido.');
+        }
+      });
+
+      this.crearSolicitud(productosSolicitud);
+    }
+
+    this.registrarPedido(true);
+  }
+
+  crearSolicitud(productos: any): void {
+    this.solicitudService.crearSolicitud(productos).subscribe({
+      next: () => {
+        this.snackBar.open('Solicitud de reposición enviada correctamente', '', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+          panelClass: ['snackbar-success'],
+        });
+
+        this.registrarPedido(true);
+      },
+      error: (e) => {
+        console.error('Error al solicitar reposición:', e);
+        this.snackBar.open('Error al solicitar reposición', '', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+          panelClass: ['snackbar-error'],
+        });
+      },
+    });
   }
 
   checkAndRetryOrder(): void {
@@ -228,7 +292,7 @@ export class RegistrarPedidoEntranteComponent implements OnInit {
         error: (e) => {
           console.error('Error al reintentar registrar el pedido:', e);
           this.errorMessage = e.error.mensaje || 'No se pudo registrar el pedido debido a un problema de stock.';
-        }
+        },
       });
     }
   }
@@ -236,7 +300,6 @@ export class RegistrarPedidoEntranteComponent implements OnInit {
   calcularTotalPedido(): number {
     return this.productosPedido.reduce((total, item) => total + item.producto.precio * item.cantidad, 0);
   }
-
 
   eliminarTodosLosProductos(): void {
     const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar TODOS los productos?');

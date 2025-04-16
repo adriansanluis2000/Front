@@ -8,7 +8,7 @@ export interface Pedido {
         precio: number;
         stock: number;
         descripcion?: string;
-        PedidoProducto: {
+        ProductoPedido: {
             cantidad: number;
         }
     }>;

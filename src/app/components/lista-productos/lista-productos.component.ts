@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ProductoService } from '../../services/producto.service';
 import { NgFor, NgIf } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { SolicitudService } from '../../services/solicitud.service';
 
 @Component({
   selector: 'app-lista-productos',
@@ -16,11 +17,15 @@ export class ListaProductosComponent implements OnInit {
   productoSeleccionado: any;
   productoForm: FormGroup;
   ordenAscendente: boolean = true;
-  
+
   errorMessage: string = '';
   busqueda: string = '';
 
-  constructor(private readonly productoService: ProductoService, private readonly fb: FormBuilder) {
+  constructor(
+    private readonly productoService: ProductoService,
+    private readonly solicitudService: SolicitudService,
+    private readonly fb: FormBuilder
+  ) {
     this.productoForm = this.fb.group({
       nombre: ['', Validators.required],
       descripcion: [''],
@@ -103,6 +108,31 @@ export class ListaProductosComponent implements OnInit {
         ...this.productoForm.value,
       };
 
+      if (productoActualizado.stock < productoActualizado.umbral) {
+        const confirmacion = window.confirm(
+          `El stock de ${productoActualizado.nombre} ha caído por debajo del umbral. ¿Deseas realizar un pedido?`
+        );
+        if (confirmacion) {
+          const cantidadPedido = window.prompt(
+            `Introduce la cantidad a pedir para ${productoActualizado.nombre} (déjalo vacío para usar el valor predeterminado)`
+          );
+
+          const cantidadFinal = cantidadPedido ? parseInt(cantidadPedido, 10) : 10; // 10 es el valor predeterminado
+          if (!isNaN(cantidadFinal) && cantidadFinal > 0) {
+            const productosSolicitud = [
+              {
+                id: productoActualizado.id,
+                cantidad: cantidadFinal,
+              }
+            ];
+
+            this.realizarPedido(productosSolicitud);
+          } else {
+            alert('Cantidad inválida. No se realizará el pedido.');
+          }
+        }
+      }
+
       this.productoService.actualizarProducto(productoActualizado.id, productoActualizado).subscribe({
         next: () => {
           console.log('any actualizado con éxito');
@@ -116,6 +146,19 @@ export class ListaProductosComponent implements OnInit {
     } else {
       console.log('Formulario no válido o producto no seleccionado');
     }
+  }
+
+  realizarPedido(productos: any): void {
+    this.solicitudService.crearSolicitud(productos).subscribe({
+      next: () => {
+        console.log(
+          `Pedido realizado con éxito para el producto ID: ${productos[0].id}, Cantidad: ${productos[0].cantidad}`
+        );
+      },
+      error: (e) => {
+        console.error('Error al realizar el pedido', e);
+      },
+    });
   }
 
   ordenarPorNombre(): void {

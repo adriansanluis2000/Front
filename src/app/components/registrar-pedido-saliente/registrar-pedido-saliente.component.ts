@@ -62,7 +62,7 @@ export class RegistrarPedidoSalienteComponent implements OnInit {
           precio: number;
           stock: number;
           descripcion?: string;
-          PedidoProducto: { cantidad: number; };
+          ProductoPedido: { cantidad: number; };
         }) => ({
           producto: {
             id: producto.id,
@@ -71,7 +71,7 @@ export class RegistrarPedidoSalienteComponent implements OnInit {
             stock: producto.stock,
             descripcion: producto.descripcion
           },
-          cantidad: producto.PedidoProducto.cantidad
+          cantidad: producto.ProductoPedido.cantidad
         }));
       });
     }

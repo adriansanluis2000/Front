@@ -12,17 +12,17 @@ describe('HistorialPedidosSalientesComponent', () => {
   const pedidosMock = [
     {
       id: 1, fecha: '2024-11-12T10:00:00', precioTotal: 100, estado: 'Enviado', tipo: 'saliente', Productos: [
-        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
+        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, ProductoPedido: { cantidad: 2 } }
       ]
     },
     {
       id: 2, fecha: '2024-11-11T15:00:00', precioTotal: 50, estado: 'Enviado', tipo: 'saliente', Productos: [
-        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
+        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, ProductoPedido: { cantidad: 2 } }
       ]
     },
     {
       id: 3, fecha: '2024-11-10T09:00:00', precioTotal: 200, estado: 'Enviado', tipo: 'saliente', Productos: [
-        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }
+        { id: 1, nombre: 'Gafas', precio: 50, stock: 30, ProductoPedido: { cantidad: 2 } }
       ]
     }
   ];
@@ -91,7 +91,7 @@ describe('HistorialPedidosSalientesComponent', () => {
             fecha: new Date(),
             precioTotal: 100,
             Productos: [
-              { nombre: 'Gafas', precio: 50, PedidoProducto: { cantidad: 2 } }
+              { nombre: 'Gafas', precio: 50, ProductoPedido: { cantidad: 2 } }
             ]
           }
         ]));

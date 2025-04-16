@@ -4,6 +4,7 @@ import { ProductoService } from '../../services/producto.service';
 import { PedidoService } from '../../services/pedido.service';
 import { of, throwError } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 
 describe('RegistrarPedidoEntranteComponent', () => {
   let component: RegistrarPedidoEntranteComponent;
@@ -18,11 +19,11 @@ describe('RegistrarPedidoEntranteComponent', () => {
     activatedRouteMock = {};
 
     await TestBed.configureTestingModule({
-      imports: [RegistrarPedidoEntranteComponent],
+      imports: [RegistrarPedidoEntranteComponent, HttpClientModule],
       providers: [
         { provide: PedidoService, useValue: pedidoServiceMock },
         { provide: ProductoService, useValue: productoServiceMock },
-        { provide: ActivatedRoute, useValue: activatedRouteMock }
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
       ],
     }).compileComponents();
 
@@ -30,10 +31,12 @@ describe('RegistrarPedidoEntranteComponent', () => {
     component = fixture.componentInstance;
 
     // Mockea el servicio para recibir algunos productos
-    productoServiceMock.obtenerProductos.and.returnValue(of([
-      { id: 1, nombre: 'Producto 1', precio: 10 },
-      { id: 2, nombre: 'Producto 2', precio: 15 }
-    ]));
+    productoServiceMock.obtenerProductos.and.returnValue(
+      of([
+        { id: 1, nombre: 'Producto 1', precio: 10 },
+        { id: 2, nombre: 'Producto 2', precio: 15 },
+      ])
+    );
 
     component.cargarProductos();
   });
@@ -49,7 +52,7 @@ describe('RegistrarPedidoEntranteComponent', () => {
       expect(component.productosPedido[0]).toEqual({ producto: productoMock, cantidad: 1 });
 
       // Finalizar pedido
-      component.registrarPedido();
+      component.registrarPedido(true);
 
       expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith([{ id: 1, cantidad: 1 }]);
       expect(component.productosPedido.length).toBe(0); // Debería limpiarse el pedido después de enviado
@@ -60,7 +63,7 @@ describe('RegistrarPedidoEntranteComponent', () => {
     it('debería notificar la falta de conexión y no registrar el pedido', () => {
       // Simulamos que no hay conexión
       spyOnProperty(navigator, 'onLine').and.returnValue(false);
-      component.registrarPedido();
+      component.registrarPedido(true);
 
       expect(pedidoServiceMock.registrarPedido).not.toHaveBeenCalled();
       expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
@@ -71,30 +74,32 @@ describe('RegistrarPedidoEntranteComponent', () => {
       const onlineSpy = spyOnProperty(navigator, 'onLine', 'get').and.returnValue(false);
       component.productosPedido.push({ producto: { id: 1 }, cantidad: 1 });
 
-      component.registrarPedido();
+      component.registrarPedido(true);
 
       // Simulamos que se restablece la conexión
       onlineSpy.and.returnValue(true); // Reconfigura el espía
       pedidoServiceMock.registrarPedido.and.returnValue(of({ success: true }));
 
-      component.registrarPedido(); // Llama nuevamente para registrar el pedido
+      component.registrarPedido(true); // Llama nuevamente para registrar el pedido
 
       expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith({
         productos: [{ id: 1, cantidad: 1 }],
-        tipo: 'entrante'
+        tipo: 'entrante',
       });
     });
   });
 
   describe('Prueba de Error por Fallo en la Base de Datos', () => {
     it('debería mostrar un mensaje de error si falla al guardar el pedido en la base de datos', () => {
-      pedidoServiceMock.registrarPedido.and.returnValue(throwError({ error: { mensaje: 'Error en la base de datos' } }));
+      pedidoServiceMock.registrarPedido.and.returnValue(
+        throwError({ error: { mensaje: 'Error en la base de datos' } })
+      );
 
       // Espiar la consola para comprobar errores
       const consoleErrorSpy = spyOn(console, 'error').and.callThrough();
 
       component.agregarProducto({ id: 1, nombre: 'Producto 1', precio: 10 });
-      component.registrarPedido();
+      component.registrarPedido(true);
 
       // Verificamos que el producto sigue en el pedido
       expect(component.productosPedido.length).toBe(1);
@@ -109,21 +114,22 @@ describe('RegistrarPedidoEntranteComponent', () => {
     });
 
     it('debería permitir reintentar guardar el pedido después de un fallo en la base de datos', () => {
-      pedidoServiceMock.registrarPedido.and.returnValue(throwError({ error: { mensaje: 'Error en la base de datos' } }));
+      pedidoServiceMock.registrarPedido.and.returnValue(
+        throwError({ error: { mensaje: 'Error en la base de datos' } })
+      );
       component.agregarProducto({ id: 1, nombre: 'Producto 1', precio: 10 });
-      component.registrarPedido();
+      component.registrarPedido(true);
 
       pedidoServiceMock.registrarPedido.and.returnValue(of({ success: true }));
-      component.registrarPedido();
+      component.registrarPedido(true);
 
       expect(component.productosPedido.length).toBe(0);
       expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith({
         productos: [{ id: 1, cantidad: 1 }],
-        tipo: 'entrante'
+        tipo: 'entrante',
       });
     });
   });
-
 
   describe('Pruebas de eliminación de productos del pedido', () => {
     describe('Prueba de Éxito: Eliminar Producto de Pedido en Recepción', () => {
@@ -137,7 +143,6 @@ describe('RegistrarPedidoEntranteComponent', () => {
       });
     });
   });
-
 
   describe('Pruebas de Editar Cantidad de Producto en Recepción', () => {
     describe('Prueba de Éxito: Editar Cantidad de Producto en el Pedido', () => {

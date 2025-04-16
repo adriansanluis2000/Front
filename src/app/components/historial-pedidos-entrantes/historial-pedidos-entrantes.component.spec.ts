@@ -16,7 +16,7 @@ describe('HistorialPedidosEntrantesComponent', () => {
       precioTotal: 100,
       estado: 'Enviado',
       tipo: 'entrante',
-      Productos: [{ id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }],
+      Productos: [{ id: 1, nombre: 'Gafas', precio: 50, stock: 30, ProductoPedido: { cantidad: 2 } }],
     },
     {
       id: 2,
@@ -24,7 +24,7 @@ describe('HistorialPedidosEntrantesComponent', () => {
       precioTotal: 50,
       estado: 'Enviado',
       tipo: 'entrante',
-      Productos: [{ id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }],
+      Productos: [{ id: 1, nombre: 'Gafas', precio: 50, stock: 30, ProductoPedido: { cantidad: 2 } }],
     },
     {
       id: 3,
@@ -32,7 +32,7 @@ describe('HistorialPedidosEntrantesComponent', () => {
       precioTotal: 200,
       estado: 'Enviado',
       tipo: 'entrante',
-      Productos: [{ id: 1, nombre: 'Gafas', precio: 50, stock: 30, PedidoProducto: { cantidad: 2 } }],
+      Productos: [{ id: 1, nombre: 'Gafas', precio: 50, stock: 30, ProductoPedido: { cantidad: 2 } }],
     },
   ];
 
@@ -96,7 +96,7 @@ describe('HistorialPedidosEntrantesComponent', () => {
               id: 1,
               fecha: new Date(),
               precioTotal: 100,
-              Productos: [{ nombre: 'Gafas', precio: 50, PedidoProducto: { cantidad: 2 } }],
+              Productos: [{ nombre: 'Gafas', precio: 50, ProductoPedido: { cantidad: 2 } }],
             },
           ])
         );

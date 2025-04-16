@@ -50,7 +50,7 @@
             </div>
 
             <!-- Botón para registrar el pedido -->
-            <button class="button-success" *ngIf="productosPedido.length > 0" (click)="registrarPedido()">
+            <button class="button-success" *ngIf="productosPedido.length > 0" (click)="registrarPedido(false)">
                 {{ textoBoton }}
             </button>
 

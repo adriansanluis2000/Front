@@ -3,6 +3,7 @@ import { ListaProductosComponent } from './lista-productos.component';
 import { ProductoService } from '../../services/producto.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
+import { HttpClientModule } from '@angular/common/http';
 
 describe('ListaProductosComponent', () => {
   let component: ListaProductosComponent;
@@ -17,7 +18,7 @@ describe('ListaProductosComponent', () => {
     ]);
 
     TestBed.configureTestingModule({
-      imports: [ListaProductosComponent, ReactiveFormsModule],
+      imports: [ListaProductosComponent, ReactiveFormsModule, HttpClientModule],
       providers: [
         {
           provide: ProductoService,
