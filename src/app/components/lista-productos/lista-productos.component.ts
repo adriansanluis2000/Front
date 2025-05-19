@@ -78,6 +78,7 @@ export class ListaProductosComponent implements OnInit {
       this.productoService.eliminarProducto(id).subscribe({
         next: () => {
           this.productos = this.productos.filter((producto) => producto.id !== id);
+          this.productosFiltrados = this.productos;
         },
         error: (e) => {
           console.error('Error al eliminar producto', e);
