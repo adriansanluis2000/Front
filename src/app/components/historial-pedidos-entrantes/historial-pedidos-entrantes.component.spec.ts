@@ -37,7 +37,11 @@ describe('HistorialPedidosEntrantesComponent', () => {
   ];
 
   beforeEach(async () => {
-    pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['obtenerHistorialPedidos', 'eliminarPedido', 'devolverStock']);
+    pedidoServiceMock = jasmine.createSpyObj('PedidoService', [
+      'obtenerHistorialPedidos',
+      'eliminarPedido',
+      'devolverStock',
+    ]);
 
     await TestBed.configureTestingModule({
       imports: [HistorialPedidosEntrantesComponent],
@@ -153,20 +157,20 @@ describe('HistorialPedidosEntrantesComponent', () => {
         spyOn(window, 'confirm').and.returnValues(true, true); // Confirmaciones para eliminar y devolver stock
         pedidoServiceMock.devolverStock.and.returnValue(of({}));
         pedidoServiceMock.eliminarPedido.and.returnValue(of({}));
-  
+
         component.eliminarPedido(pedidoId);
-  
+
         expect(pedidoServiceMock.devolverStock).toHaveBeenCalledWith(pedidoId);
         expect(pedidoServiceMock.eliminarPedido).toHaveBeenCalledWith(pedidoId);
         expect(component.pedidos.length).toBe(0);
       });
-  
+
       it('debe eliminar el pedido correctamente sin devolver stock', () => {
         spyOn(window, 'confirm').and.returnValues(true, false); // Confirmaciones para eliminar y no devolver stock
         pedidoServiceMock.eliminarPedido.and.returnValue(of({}));
-  
+
         component.eliminarPedido(pedidoId);
-  
+
         expect(pedidoServiceMock.devolverStock).not.toHaveBeenCalled();
         expect(pedidoServiceMock.eliminarPedido).toHaveBeenCalledWith(pedidoId);
         expect(component.pedidos.length).toBe(0);
@@ -241,6 +245,27 @@ describe('HistorialPedidosEntrantesComponent', () => {
         expect(component.pedidos.length).toBe(3);
         expect(component.errorBusqueda).toBe('Número de pedido inválido. Solo se permiten números.');
       });
+    });
+  });
+
+  describe('editarPedido', () => {
+    it('debería navegar a la ruta correcta con el pedidoId', () => {
+      const routerSpy = spyOn(component['router'], 'navigate');
+      const pedidoId = 123;
+
+      component.editarPedido(pedidoId);
+
+      expect(routerSpy).toHaveBeenCalledWith(['/registrar-pedido-entrante', pedidoId]);
+    });
+  });
+
+  describe('cerrarDetalles', () => {
+    it('debería establecer pedidoSeleccionado a null', () => {
+      component.pedidoSeleccionado = pedidosMock[0];
+
+      component.cerrarDetalles();
+
+      expect(component.pedidoSeleccionado).toBeNull();
     });
   });
 });

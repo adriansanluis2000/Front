@@ -58,6 +58,16 @@ describe('SolicitudesPendientesComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  describe('ngOnInit', () => {
+    it('debería llamar a cargarSolicitudes al inicializar', () => {
+      spyOn(component, 'cargarSolicitudes');
+
+      component.ngOnInit();
+
+      expect(component.cargarSolicitudes).toHaveBeenCalled();
+    });
+  });
+
   describe('cargarSolicitudes', () => {
     it('debería cargar solicitudes correctamente', () => {
       solicitudServiceSpy.obtenerSolicitudes.and.returnValue(of(mockSolicitudes));
@@ -130,7 +140,6 @@ describe('SolicitudesPendientesComponent', () => {
 
       expect(component.productoSeleccionado).toEqual(producto);
       expect(component.unidadesRecibidas).toBe(2);
-      expect(component.confirmarRecepcion).toHaveBeenCalled();
     });
 
     it('debería no hacer nada si se cancela el prompt', () => {

@@ -6,17 +6,25 @@ import { of, throwError } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { SolicitudService } from '../../services/solicitud.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Solicitud } from '../../models/solicitud.model';
+import { PLATFORM_ID } from '@angular/core';
 
 describe('RegistrarPedidoEntranteComponent', () => {
   let component: RegistrarPedidoEntranteComponent;
   let fixture: ComponentFixture<RegistrarPedidoEntranteComponent>;
   let pedidoServiceMock: jasmine.SpyObj<PedidoService>;
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
+  let solicitudServiceMock: jasmine.SpyObj<SolicitudService>;
+  let snackBarMock: jasmine.SpyObj<MatSnackBar>;
   let activatedRouteMock: Partial<ActivatedRoute>;
 
   beforeEach(async () => {
     pedidoServiceMock = jasmine.createSpyObj('PedidoService', ['registrarPedido']);
     productoServiceMock = jasmine.createSpyObj('ProductoService', ['obtenerProductos']);
+    solicitudServiceMock = jasmine.createSpyObj('SolicitudService', ['crearSolicitud']);
+    snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
     activatedRouteMock = {};
 
     await TestBed.configureTestingModule({
@@ -24,7 +32,10 @@ describe('RegistrarPedidoEntranteComponent', () => {
       providers: [
         { provide: PedidoService, useValue: pedidoServiceMock },
         { provide: ProductoService, useValue: productoServiceMock },
+        { provide: SolicitudService, useValue: solicitudServiceMock },
+        { provide: MatSnackBar, useValue: snackBarMock },
         { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: PLATFORM_ID, useValue: 'browser' },
       ],
     }).compileComponents();
 
@@ -40,6 +51,55 @@ describe('RegistrarPedidoEntranteComponent', () => {
     );
 
     component.cargarProductos();
+  });
+
+  describe('ngOnInit', () => {
+    const pedidoMock = {
+      Productos: [
+        {
+          id: 1,
+          nombre: 'P1',
+          precio: 100,
+          stock: 10,
+          umbral: 2,
+          ProductoPedido: { cantidad: 5 },
+        },
+      ],
+    };
+
+    function setupPedidoMock() {
+      activatedRouteMock.snapshot = {
+        paramMap: {
+          get: (key: string) => (key === 'pedidoId' ? '123' : null),
+        },
+      } as any;
+
+      pedidoServiceMock.obtenerPedidoPorId = jasmine.createSpy().and.returnValue(of(pedidoMock));
+    }
+
+    it('debería llamar a cargarProductos y configurar evento online si es plataforma navegador', () => {
+      spyOn(component, 'cargarProductos');
+      spyOn(window, 'addEventListener');
+
+      setupPedidoMock();
+
+      component.ngOnInit();
+
+      expect(component.cargarProductos).toHaveBeenCalled();
+      expect(window.addEventListener).toHaveBeenCalledWith('online', jasmine.any(Function));
+    });
+
+    it('debería cargar un pedido existente si hay pedidoId en la ruta', () => {
+      setupPedidoMock();
+
+      component.ngOnInit();
+
+      expect(component.actualizarPedido).toBeTrue();
+      expect(component.textoBoton).toBe('Actualizar pedido');
+      expect(component.productosPedido.length).toBe(1);
+      expect(component.productosPedido[0].producto.nombre).toBe('P1');
+      expect(component.productosPedido[0].cantidad).toBe(5);
+    });
   });
 
   describe('Prueba de Éxito: Registrar Recepción de Pedido', () => {
@@ -213,6 +273,156 @@ describe('RegistrarPedidoEntranteComponent', () => {
         expect(component.productosPedido[0].cantidad).toBe(5); // La cantidad se ajusta al máximo disponible
         expect(component.calcularTotalPedido()).toBe(50); // Total ajustado
       });
+    });
+  });
+
+  describe('verificarStockBajo', () => {
+    it('debería devolver productos cuyo stock es igual o menor al umbral + cantidad', () => {
+      const productos = [
+        { producto: { id: 1, nombre: 'P1', stock: 5, umbral: 3 }, cantidad: 2 }, // 5 <= 3+2
+        { producto: { id: 2, nombre: 'P2', stock: 10, umbral: 5 }, cantidad: 2 }, // 10 > 5+2
+      ];
+
+      const resultado = component.verificarStockBajo(productos);
+
+      expect(resultado.length).toBe(1);
+      expect(resultado[0].producto.nombre).toBe('P1');
+    });
+  });
+
+  describe('mostrarAlertaStockBajo', () => {
+    beforeEach(() => {
+      spyOn(window, 'alert');
+      spyOn(component, 'crearSolicitud').and.stub();
+      spyOn(component, 'registrarPedido').and.stub();
+    });
+
+    it('debería confirmar y crear una solicitud con cantidad predeterminada si se acepta y no se introduce valor', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'prompt').and.returnValue('');
+
+      const productos = [{ producto: { id: 1, nombre: 'P1' }, cantidad: 2 }];
+
+      component.mostrarAlertaStockBajo(productos);
+
+      expect(component.crearSolicitud).toHaveBeenCalledWith([{ id: 1, cantidad: 10 }]);
+      expect(component.registrarPedido).toHaveBeenCalledWith(true);
+    });
+
+    it('debería crear solicitud con cantidad introducida si es válida', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'prompt').and.returnValue('5');
+
+      const productos = [{ producto: { id: 1, nombre: 'P1' }, cantidad: 2 }];
+
+      component.mostrarAlertaStockBajo(productos);
+
+      expect(component.crearSolicitud).toHaveBeenCalledWith([{ id: 1, cantidad: 5 }]);
+    });
+
+    it('debería mostrar alerta si la cantidad introducida es inválida', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'prompt').and.returnValue('abc');
+
+      const productos = [{ producto: { id: 1, nombre: 'P1' }, cantidad: 2 }];
+
+      component.mostrarAlertaStockBajo(productos);
+
+      expect(window.alert).toHaveBeenCalledWith('Cantidad inválida. No se realizará el pedido.');
+      expect(component.crearSolicitud).toHaveBeenCalledWith([]);
+    });
+
+    it('no debería hacer nada si el usuario cancela la confirmación', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+
+      component.mostrarAlertaStockBajo([{ producto: { id: 1, nombre: 'P1' }, cantidad: 1 }]);
+
+      expect(component.crearSolicitud).not.toHaveBeenCalled();
+      expect(component.registrarPedido).toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe('crearSolicitud', () => {
+    it('debería llamar al servicio y mostrar snackBar en éxito', () => {
+      const solicitudMock = [{ id: 1, cantidad: 10 }];
+      const solicitudFake: Solicitud = {
+        id: 1,
+        fecha: '2025-06-02',
+        Productos: [],
+      };
+
+      solicitudServiceMock.crearSolicitud.and.returnValue(of(solicitudFake));
+
+      spyOn(component, 'registrarPedido');
+
+      component.crearSolicitud(solicitudMock);
+
+      expect(solicitudServiceMock.crearSolicitud).toHaveBeenCalledWith(solicitudMock);
+      expect(snackBarMock.open).toHaveBeenCalledWith(
+        'Solicitud de reposición enviada correctamente',
+        '',
+        jasmine.any(Object)
+      );
+      expect(component.registrarPedido).toHaveBeenCalledWith(true);
+    });
+
+    it('debería mostrar error en snackbar si falla la solicitud', () => {
+      solicitudServiceMock.crearSolicitud.and.returnValue(throwError(() => new Error('Error')));
+      spyOn(console, 'error');
+
+      component.crearSolicitud([{ id: 1, cantidad: 10 }]);
+
+      expect(console.error).toHaveBeenCalled();
+      expect(snackBarMock.open).toHaveBeenCalledWith('Error al solicitar reposición', '', jasmine.any(Object));
+    });
+  });
+
+  describe('checkAndRetryOrder', () => {
+    it('debería intentar registrar pedido pendiente si hay conexión', () => {
+      spyOnProperty(navigator, 'onLine', 'get').and.returnValue(true);
+      const pedido = [{ id: 1, cantidad: 2 }];
+      component.pedidoPendiente = [...pedido]; // copia
+
+      pedidoServiceMock.registrarPedido.and.returnValue(of({}));
+
+      component.checkAndRetryOrder();
+
+      expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith(pedido);
+      expect(component.pedidoPendiente.length).toBe(0);
+    });
+
+    it('debería mostrar error si el reintento falla', () => {
+      spyOnProperty(navigator, 'onLine', 'get').and.returnValue(true);
+      component.pedidoPendiente = [{ id: 1, cantidad: 2 }];
+      pedidoServiceMock.registrarPedido.and.returnValue(throwError({ error: { mensaje: 'Sin stock disponible' } }));
+
+      component.checkAndRetryOrder();
+
+      expect(component.errorMessage).toBe('Sin stock disponible');
+    });
+  });
+
+  describe('eliminarTodosLosProductos', () => {
+    it('debería eliminar todos los productos si el usuario confirma', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+
+      component.productosPedido = [
+        { producto: { id: 1 }, cantidad: 2 },
+        { producto: { id: 2 }, cantidad: 1 },
+      ];
+
+      component.eliminarTodosLosProductos();
+
+      expect(component.productosPedido.length).toBe(0);
+    });
+
+    it('no debería eliminar productos si el usuario cancela', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+      component.productosPedido = [{ producto: { id: 1 }, cantidad: 1 }];
+
+      component.eliminarTodosLosProductos();
+
+      expect(component.productosPedido.length).toBe(1);
     });
   });
 });

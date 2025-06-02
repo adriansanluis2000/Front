@@ -5,7 +5,6 @@ import { ProductoService } from '../../services/producto.service';
 import { of, throwError } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 
-
 describe('AgregarProductoComponent', () => {
   let component: AgregarProductoComponent;
   let fixture: ComponentFixture<AgregarProductoComponent>;
@@ -16,12 +15,7 @@ describe('AgregarProductoComponent', () => {
 
     TestBed.configureTestingModule({
       providers: [{ provide: ProductoService, useValue: productoServiceMock }],
-      imports: [
-        AgregarProductoComponent,
-        FormsModule,
-        ReactiveFormsModule,
-        HttpClientModule
-      ]
+      imports: [AgregarProductoComponent, FormsModule, ReactiveFormsModule, HttpClientModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AgregarProductoComponent);
@@ -35,7 +29,7 @@ describe('AgregarProductoComponent', () => {
         descripcion: 'Descripción Test',
         precio: 100,
         stock: 10,
-        umbral: 10
+        umbral: 10,
       };
 
       productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
@@ -45,7 +39,7 @@ describe('AgregarProductoComponent', () => {
         valid: true,
         value: component.producto,
         controls: {},
-        resetForm: () => { }
+        resetForm: () => {},
       } as unknown as NgForm;
 
       spyOn(component, 'resetForm');
@@ -65,7 +59,7 @@ describe('AgregarProductoComponent', () => {
           precio: jasmine.createSpyObj('Control', ['markAsTouched']),
           stock: jasmine.createSpyObj('Control', ['markAsTouched']),
         },
-        resetForm: () => { }
+        resetForm: () => {},
       } as unknown as NgForm;
 
       component.agregarProducto(form);
@@ -83,7 +77,7 @@ describe('AgregarProductoComponent', () => {
         descripcion: 'Descripción Duplicado',
         precio: 100,
         stock: 10,
-        umbral: 10
+        umbral: 10,
       };
 
       productoServiceMock.verificarNombreProducto.and.returnValue(of(true));
@@ -92,7 +86,7 @@ describe('AgregarProductoComponent', () => {
         valid: true,
         value: component.producto,
         controls: {},
-        resetForm: () => { }
+        resetForm: () => {},
       } as unknown as NgForm;
 
       component.agregarProducto(form);
@@ -105,7 +99,7 @@ describe('AgregarProductoComponent', () => {
         descripcion: 'Descripción Única',
         precio: 100,
         stock: 10,
-        umbral: 10
+        umbral: 10,
       };
 
       productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
@@ -115,7 +109,7 @@ describe('AgregarProductoComponent', () => {
         valid: true,
         value: component.producto,
         controls: {},
-        resetForm: () => { }
+        resetForm: () => {},
       } as unknown as NgForm;
 
       spyOn(component, 'resetForm');
@@ -125,7 +119,6 @@ describe('AgregarProductoComponent', () => {
       expect(component.resetForm).toHaveBeenCalled();
       expect(component.errorMessage).toBe(''); // Asegurarse de que no hay mensajes de error
     });
-
   });
 
   describe('Prueba de precio negativo o 0', () => {
@@ -135,13 +128,13 @@ describe('AgregarProductoComponent', () => {
         descripcion: 'Descripción Test',
         precio: -50,
         stock: 10,
-        umbral: 10
+        umbral: 10,
       };
 
       const form: NgForm = {
         valid: false,
         controls: {},
-        resetForm: () => { }
+        resetForm: () => {},
       } as unknown as NgForm;
 
       component.agregarProducto(form);
@@ -156,13 +149,13 @@ describe('AgregarProductoComponent', () => {
         descripcion: 'Descripción Test',
         precio: 100,
         stock: 0,
-        umbral: 0
+        umbral: 0,
       };
 
       const form: NgForm = {
         valid: false,
         controls: {},
-        resetForm: () => { }
+        resetForm: () => {},
       } as unknown as NgForm;
 
       component.agregarProducto(form);
@@ -177,13 +170,13 @@ describe('AgregarProductoComponent', () => {
         descripcion: 'Descripción Test',
         precio: 100,
         stock: 10,
-        umbral: 0
+        umbral: 0,
       };
 
       const form: NgForm = {
         valid: false,
         controls: {},
-        resetForm: () => { }
+        resetForm: () => {},
       } as unknown as NgForm;
 
       component.agregarProducto(form);
@@ -198,13 +191,13 @@ describe('AgregarProductoComponent', () => {
         descripcion: 'Descripción Test',
         precio: 100,
         stock: 10,
-        umbral: 20
+        umbral: 20,
       };
 
       const form: NgForm = {
         valid: false,
         controls: {},
-        resetForm: () => { }
+        resetForm: () => {},
       } as unknown as NgForm;
 
       component.agregarProducto(form);
@@ -219,7 +212,7 @@ describe('AgregarProductoComponent', () => {
         descripcion: 'Descripción Test',
         precio: 100,
         stock: 10,
-        umbral: 10
+        umbral: 10,
       };
 
       productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
@@ -229,7 +222,7 @@ describe('AgregarProductoComponent', () => {
         valid: true,
         value: component.producto,
         controls: {},
-        resetForm: () => { }
+        resetForm: () => {},
       } as unknown as NgForm;
 
       component.agregarProducto(form);
@@ -244,7 +237,7 @@ describe('AgregarProductoComponent', () => {
         descripcion: 'Descripción Test',
         precio: 100,
         stock: 10,
-        umbral: 10
+        umbral: 10,
       };
 
       productoServiceMock.verificarNombreProducto.and.returnValue(of(false));
@@ -256,12 +249,39 @@ describe('AgregarProductoComponent', () => {
         valid: true,
         value: component.producto,
         controls: {},
-        resetForm: () => { }
+        resetForm: () => {},
       } as unknown as NgForm;
 
       component.agregarProducto(form);
 
       expect(component.errorMessage).toBe('Error de conexión. Verifica tu conexión a internet y vuelve a intentarlo.');
+    });
+  });
+
+  describe('resetForm', () => {
+    it('debería resetear el formulario y el producto', () => {
+      const formMock = {
+        resetForm: jasmine.createSpy('resetForm'),
+      } as unknown as NgForm;
+
+      component.producto = {
+        nombre: 'Producto viejo',
+        descripcion: 'Desc',
+        precio: 50,
+        stock: 5,
+        umbral: 2,
+      };
+
+      component.resetForm(formMock);
+
+      expect(formMock.resetForm).toHaveBeenCalled();
+      expect(component.producto).toEqual({
+        nombre: '',
+        descripcion: '',
+        precio: 0,
+        stock: 1,
+        umbral: 1,
+      });
     });
   });
 });

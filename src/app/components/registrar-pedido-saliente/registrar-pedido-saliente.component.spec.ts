@@ -23,7 +23,7 @@ describe('RegistrarPedidoSalienteComponent', () => {
       providers: [
         { provide: PedidoService, useValue: pedidoServiceMock },
         { provide: ProductoService, useValue: productoServiceMock },
-        { provide: ActivatedRoute, useValue: activatedRouteMock }
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
       ],
     }).compileComponents();
 
@@ -31,12 +31,63 @@ describe('RegistrarPedidoSalienteComponent', () => {
     component = fixture.componentInstance;
 
     // Mockea el servicio para recibir algunos productos
-    productoServiceMock.obtenerProductos.and.returnValue(of([
-      { id: 1, nombre: 'Producto 1', precio: 10 },
-      { id: 2, nombre: 'Producto 2', precio: 15 }
-    ]));
+    productoServiceMock.obtenerProductos.and.returnValue(
+      of([
+        { id: 1, nombre: 'Producto 1', precio: 10 },
+        { id: 2, nombre: 'Producto 2', precio: 15 },
+      ])
+    );
 
     component.cargarProductos();
+  });
+
+  describe('ngOnInit', () => {
+    const pedidoMock = {
+      Productos: [
+        {
+          id: 1,
+          nombre: 'P1',
+          precio: 100,
+          stock: 10,
+          umbral: 2,
+          ProductoPedido: { cantidad: 5 },
+        },
+      ],
+    };
+
+    function setupPedidoMock() {
+      activatedRouteMock.snapshot = {
+        paramMap: {
+          get: (key: string) => (key === 'pedidoId' ? '123' : null),
+        },
+      } as any;
+
+      pedidoServiceMock.obtenerPedidoPorId = jasmine.createSpy().and.returnValue(of(pedidoMock));
+    }
+
+    it('debería llamar a cargarProductos y configurar evento online si es plataforma navegador', () => {
+      spyOn(component, 'cargarProductos');
+      spyOn(window, 'addEventListener');
+
+      setupPedidoMock();
+
+      component.ngOnInit();
+
+      expect(component.cargarProductos).toHaveBeenCalled();
+      expect(window.addEventListener).toHaveBeenCalledWith('online', jasmine.any(Function));
+    });
+
+    it('debería cargar un pedido existente si hay pedidoId en la ruta', () => {
+      setupPedidoMock();
+
+      component.ngOnInit();
+
+      expect(component.actualizarPedido).toBeTrue();
+      expect(component.textoBoton).toBe('Actualizar pedido');
+      expect(component.productosPedido.length).toBe(1);
+      expect(component.productosPedido[0].producto.nombre).toBe('P1');
+      expect(component.productosPedido[0].cantidad).toBe(5);
+    });
   });
 
   describe('Prueba de Éxito: Registrar Recepción de Pedido', () => {
@@ -76,14 +127,16 @@ describe('RegistrarPedidoSalienteComponent', () => {
 
       expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith({
         productos: [{ id: 1, cantidad: 1 }],
-        tipo: 'saliente'
+        tipo: 'saliente',
       });
     });
   });
 
   describe('Prueba de Error por Fallo en la Base de Datos', () => {
     it('debería mostrar un mensaje de error si falla al guardar el pedido en la base de datos', () => {
-      pedidoServiceMock.registrarPedido.and.returnValue(throwError({ error: { mensaje: 'Error en la base de datos' } }));
+      pedidoServiceMock.registrarPedido.and.returnValue(
+        throwError({ error: { mensaje: 'Error en la base de datos' } })
+      );
 
       // Espiar la consola para comprobar errores
       const consoleErrorSpy = spyOn(console, 'error').and.callThrough();
@@ -104,7 +157,9 @@ describe('RegistrarPedidoSalienteComponent', () => {
     });
 
     it('debería permitir reintentar guardar el pedido después de un fallo en la base de datos', () => {
-      pedidoServiceMock.registrarPedido.and.returnValue(throwError({ error: { mensaje: 'Error en la base de datos' } }));
+      pedidoServiceMock.registrarPedido.and.returnValue(
+        throwError({ error: { mensaje: 'Error en la base de datos' } })
+      );
       component.agregarProducto({ id: 1, nombre: 'Producto 1', precio: 10 });
       component.registrarPedido();
 
@@ -114,11 +169,10 @@ describe('RegistrarPedidoSalienteComponent', () => {
       expect(component.productosPedido.length).toBe(0);
       expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith({
         productos: [{ id: 1, cantidad: 1 }],
-        tipo: 'saliente'
+        tipo: 'saliente',
       });
     });
   });
-
 
   describe('Pruebas de eliminación de productos del pedido', () => {
     describe('Prueba de Éxito: Eliminar Producto de Pedido en Recepción', () => {
@@ -132,7 +186,6 @@ describe('RegistrarPedidoSalienteComponent', () => {
       });
     });
   });
-
 
   describe('Pruebas de Editar Cantidad de Producto en Recepción', () => {
     describe('Prueba de Éxito: Editar Cantidad de Producto en el Pedido', () => {
@@ -189,6 +242,55 @@ describe('RegistrarPedidoSalienteComponent', () => {
         expect(item.cantidad).toBe(1);
         expect(component.calcularTotalPedido()).toBe(10);
       });
+    });
+  });
+
+  describe('checkAndRetryOrder', () => {
+    it('debería intentar registrar pedido pendiente si hay conexión', () => {
+      spyOnProperty(navigator, 'onLine', 'get').and.returnValue(true);
+      const pedido = [{ id: 1, cantidad: 2 }];
+      component.pedidoPendiente = [...pedido]; // copia
+
+      pedidoServiceMock.registrarPedido.and.returnValue(of({}));
+
+      component.checkAndRetryOrder();
+
+      expect(pedidoServiceMock.registrarPedido).toHaveBeenCalledWith(pedido);
+      expect(component.pedidoPendiente.length).toBe(0);
+    });
+
+    it('debería mostrar error si el reintento falla', () => {
+      spyOnProperty(navigator, 'onLine', 'get').and.returnValue(true);
+      component.pedidoPendiente = [{ id: 1, cantidad: 2 }];
+      pedidoServiceMock.registrarPedido.and.returnValue(throwError({ error: { mensaje: 'Sin stock disponible' } }));
+
+      component.checkAndRetryOrder();
+
+      expect(component.errorMessage).toBe('Sin stock disponible');
+    });
+  });
+
+  describe('eliminarTodosLosProductos', () => {
+    it('debería eliminar todos los productos si el usuario confirma', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+
+      component.productosPedido = [
+        { producto: { id: 1 }, cantidad: 2 },
+        { producto: { id: 2 }, cantidad: 1 },
+      ];
+
+      component.eliminarTodosLosProductos();
+
+      expect(component.productosPedido.length).toBe(0);
+    });
+
+    it('no debería eliminar productos si el usuario cancela', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+      component.productosPedido = [{ producto: { id: 1 }, cantidad: 1 }];
+
+      component.eliminarTodosLosProductos();
+
+      expect(component.productosPedido.length).toBe(1);
     });
   });
 });

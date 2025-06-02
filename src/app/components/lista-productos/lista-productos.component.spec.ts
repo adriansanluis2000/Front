@@ -4,11 +4,14 @@ import { ProductoService } from '../../services/producto.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
+import { SolicitudService } from '../../services/solicitud.service';
+import { Solicitud } from '../../models/solicitud.model';
 
 describe('ListaProductosComponent', () => {
   let component: ListaProductosComponent;
   let fixture: ComponentFixture<ListaProductosComponent>;
   let productoServiceMock: jasmine.SpyObj<ProductoService>;
+  let solicitudServiceMock: jasmine.SpyObj<SolicitudService>;
 
   beforeEach(async () => {
     productoServiceMock = jasmine.createSpyObj('ProductoService', [
@@ -17,13 +20,13 @@ describe('ListaProductosComponent', () => {
       'actualizarProducto',
     ]);
 
+    solicitudServiceMock = jasmine.createSpyObj('SolicitudService', ['crearSolicitud']);
+
     TestBed.configureTestingModule({
       imports: [ListaProductosComponent, ReactiveFormsModule, HttpClientModule],
       providers: [
-        {
-          provide: ProductoService,
-          useValue: productoServiceMock,
-        },
+        { provide: ProductoService, useValue: productoServiceMock },
+        { provide: SolicitudService, useValue: solicitudServiceMock },
       ],
     }).compileComponents();
 
