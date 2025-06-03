@@ -1,11 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ListaProductosComponent } from './lista-productos.component';
 import { ProductoService } from '../../services/producto.service';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
 import { SolicitudService } from '../../services/solicitud.service';
-import { Solicitud } from '../../models/solicitud.model';
 
 describe('ListaProductosComponent', () => {
   let component: ListaProductosComponent;
@@ -494,6 +493,139 @@ describe('ListaProductosComponent', () => {
       component.filtrarProductos();
       expect(component.productosFiltrados.length).toBe(1);
       expect(component.productos[0].nombre).toContain('Gafas');
+    });
+  });
+
+  describe('realizarPedido', () => {
+    const productosMock = [{ id: 123, cantidad: 2, nombre: 'Gafas modelo A' }];
+
+    it('debería realizar el pedido correctamente y mostrar mensaje en consola', () => {
+      solicitudServiceMock.crearSolicitud.and.returnValue(
+        of({
+          id: 1,
+          fecha: '2025-01-01',
+          Productos: [], // o un array con productos mockeados si hace falta
+        })
+      );
+      const consoleSpy = spyOn(console, 'log');
+
+      component.realizarPedido(productosMock);
+
+      expect(solicitudServiceMock.crearSolicitud).toHaveBeenCalledWith(productosMock);
+      expect(consoleSpy).toHaveBeenCalledWith('Pedido realizado con éxito para el producto ID: 123, Cantidad: 2');
+    });
+
+    it('debería mostrar un error en consola si falla la creación del pedido', () => {
+      const error = { status: 500, message: 'Internal Server Error' };
+      solicitudServiceMock.crearSolicitud.and.returnValue(throwError(() => error));
+      const consoleErrorSpy = spyOn(console, 'error');
+
+      component.realizarPedido(productosMock);
+
+      expect(solicitudServiceMock.crearSolicitud).toHaveBeenCalledWith(productosMock);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error al realizar el pedido', error);
+    });
+  });
+
+  describe('guardarProducto', () => {
+    beforeEach(() => {
+      component.productoSeleccionado = {
+        id: 1,
+        nombre: 'Gafas de sol',
+        descripcion: 'Descripción',
+        precio: 100,
+        stock: 4,
+        umbral: 5,
+      };
+
+      component.productoForm = new FormBuilder().group({
+        nombre: ['Gafas de sol'],
+        descripcion: ['Descripción'],
+        precio: [100],
+        stock: [4],
+        umbral: [5],
+      });
+
+      spyOn(component, 'cerrarModal');
+      spyOn(component, 'obtenerProductos');
+    });
+
+    it('debería actualizar el producto sin realizar pedido si el stock no está por debajo del umbral', () => {
+      component.productoSeleccionado.stock = 10;
+      component.productoSeleccionado.umbral = 5;
+      component.productoForm.patchValue({ stock: 10, umbral: 5 });
+
+      productoServiceMock.actualizarProducto.and.returnValue(of({}));
+
+      component.guardarProducto();
+
+      expect(productoServiceMock.actualizarProducto).toHaveBeenCalledWith(
+        1,
+        jasmine.objectContaining({ nombre: 'Gafas de sol', stock: 10 })
+      );
+      expect(component.cerrarModal).toHaveBeenCalled();
+      expect(component.obtenerProductos).toHaveBeenCalled();
+    });
+
+    it('debería realizar un pedido si el stock está por debajo del umbral y se confirman ambos diálogos', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'prompt').and.returnValue('15');
+      spyOn(component, 'realizarPedido');
+
+      productoServiceMock.actualizarProducto.and.returnValue(of({}));
+
+      component.guardarProducto();
+
+      expect(window.confirm).toHaveBeenCalled();
+      expect(window.prompt).toHaveBeenCalled();
+      expect(component.realizarPedido).toHaveBeenCalledWith([{ id: 1, cantidad: 15 }]);
+    });
+
+    it('debería usar el valor predeterminado si no se introduce cantidad', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'prompt').and.returnValue('');
+      spyOn(component, 'realizarPedido');
+
+      productoServiceMock.actualizarProducto.and.returnValue(of({}));
+
+      component.guardarProducto();
+
+      expect(component.realizarPedido).toHaveBeenCalledWith([{ id: 1, cantidad: 10 }]);
+    });
+
+    it('no debería realizar el pedido si se introduce una cantidad inválida', () => {
+      spyOn(window, 'confirm').and.returnValue(true);
+      spyOn(window, 'prompt').and.returnValue('abc');
+      spyOn(component, 'realizarPedido');
+      spyOn(window, 'alert');
+
+      productoServiceMock.actualizarProducto.and.returnValue(of({}));
+
+      component.guardarProducto();
+
+      expect(component.realizarPedido).not.toHaveBeenCalled();
+      expect(window.alert).toHaveBeenCalledWith('Cantidad inválida. No se realizará el pedido.');
+    });
+
+    it('no debería actualizar si no hay producto seleccionado', () => {
+      component.productoSeleccionado = null;
+      spyOn(console, 'log');
+
+      component.guardarProducto();
+
+      expect(console.log).toHaveBeenCalledWith('Formulario no válido o producto no seleccionado');
+      expect(productoServiceMock.actualizarProducto).not.toHaveBeenCalled();
+    });
+
+    it('debería manejar error en la actualización del producto', () => {
+      spyOn(window, 'confirm').and.returnValue(false);
+      spyOn(console, 'error');
+
+      productoServiceMock.actualizarProducto.and.returnValue(throwError(() => new Error('Error de red')));
+
+      component.guardarProducto();
+
+      expect(console.error).toHaveBeenCalledWith('Error al actualizar producto', jasmine.any(Error));
     });
   });
 });
