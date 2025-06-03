@@ -1,0 +1,29 @@
+<div class="grid-container">
+    <div class="grid-item">
+        <canvas #stackedBarChart></canvas>
+    </div>
+    <div class="grid-item">
+        <canvas #pieChart></canvas>
+    </div>
+    <div class="grid-item">
+        <div class="kpi-card">
+            <h3>Pedidos Entrantes</h3>
+            <p>{{ totalPedidosEntrantes }}</p>
+        </div>
+        <div class="kpi-card">
+            <h3>Pedidos Salientes</h3>
+            <p>{{ totalPedidosSalientes }}</p>
+        </div>
+        <div class="kpi-card">
+            <h3>Total Unidades Vendidas</h3>
+            <p>{{ totalUnidadesVendidas }}</p>
+        </div>
+        <div class="kpi-card" *ngIf="productoMasVendido">
+            <h3>Producto Más Vendido</h3>
+            <p>{{ productoMasVendido.nombre }} ({{ productoMasVendido.totalVendidos }} unidades)</p>
+        </div>
+    </div>
+    <div class="grid-item">
+        <canvas #scatterChart></canvas>
+    </div>
+</div>
