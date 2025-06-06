@@ -17,8 +17,8 @@ export class HomeComponent {
   @ViewChild('stackedBarChart') stackedBarChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('scatterChart') scatterChartRef!: ElementRef<HTMLCanvasElement>;
 
-  chartPie: Chart | null = null;
-  chartStackedBar: Chart | null = null;
+  pieChart: Chart | null = null;
+  stackedBarChart: Chart | null = null;
   scatterChart: Chart | null = null;
 
   productosVendidos: Array<{ id: number; nombre: string; totalVendidos: number }> = [];
@@ -119,14 +119,14 @@ export class HomeComponent {
   }
 
   crearGraficoPie() {
-    if (this.chartPie) {
-      this.chartPie.destroy();
+    if (this.pieChart) {
+      this.pieChart.destroy();
     }
 
     const ctx = this.pieChartRef.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    this.chartPie = new Chart(ctx, {
+    this.pieChart = new Chart(ctx, {
       type: 'pie',
       data: {
         labels: this.productosBeneficio.map((p) => p.nombre),
@@ -155,8 +155,8 @@ export class HomeComponent {
   }
 
   crearGraficoBarrasApiladas() {
-    if (this.chartStackedBar) {
-      this.chartStackedBar.destroy();
+    if (this.stackedBarChart) {
+      this.stackedBarChart.destroy();
     }
 
     const ctx = this.stackedBarChartRef.nativeElement.getContext('2d');
@@ -186,7 +186,7 @@ export class HomeComponent {
       });
     });
 
-    this.chartStackedBar = new Chart(ctx, {
+    this.stackedBarChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: nombresProductos,
@@ -310,18 +310,5 @@ export class HomeComponent {
       '#00008B',
     ];
     return Array.from({ length: cantidad }, (_, i) => colores[i % colores.length]);
-  }
-
-  getColor(index: number, alpha: number) {
-    const baseColors = [
-      '255, 99, 132', // rojo
-      '54, 162, 235', // azul
-      '255, 206, 86', // amarillo
-      '75, 192, 192', // verde azulado
-      '153, 102, 255', // morado
-      '255, 159, 64', // naranja
-    ];
-    const color = baseColors[index % baseColors.length];
-    return `rgba(${color}, ${alpha})`;
   }
 }

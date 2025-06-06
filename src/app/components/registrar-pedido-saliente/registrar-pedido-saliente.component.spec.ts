@@ -270,6 +270,18 @@ describe('RegistrarPedidoSalienteComponent', () => {
     });
   });
 
+  it('debería eliminar el producto si el usuario confirma', () => {
+    const producto = { id: 1, nombre: 'Producto Test', precio: 10 };
+    const item = { producto, cantidad: 1 };
+    component.productosPedido.push(item);
+
+    spyOn(window, 'confirm').and.returnValue(true);
+
+    component.actualizarProducto({ ...item, cantidad: 0 });
+
+    expect(component.productosPedido.length).toBe(0);
+  });
+
   describe('eliminarTodosLosProductos', () => {
     it('debería eliminar todos los productos si el usuario confirma', () => {
       spyOn(window, 'confirm').and.returnValue(true);
