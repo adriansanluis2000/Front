@@ -4,6 +4,7 @@ import { AgregarProductoComponent } from './agregar-producto.component';
 import { ProductoService } from '../../services/producto.service';
 import { of, throwError } from 'rxjs';
 import { HttpClientModule } from '@angular/common/http';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('AgregarProductoComponent', () => {
   let component: AgregarProductoComponent;
@@ -15,7 +16,7 @@ describe('AgregarProductoComponent', () => {
 
     TestBed.configureTestingModule({
       providers: [{ provide: ProductoService, useValue: productoServiceMock }],
-      imports: [AgregarProductoComponent, FormsModule, ReactiveFormsModule, HttpClientModule],
+      imports: [AgregarProductoComponent, FormsModule, ReactiveFormsModule, HttpClientModule, NoopAnimationsModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AgregarProductoComponent);
