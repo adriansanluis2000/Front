@@ -14,7 +14,7 @@
             rows="4"></textarea>
 
         <label for="precio">Precio:</label>
-        <input type="number" id="precio" name="precio" [(ngModel)]="producto.precio" #precio="ngModel" required min="1">
+        <input type="number" id="precio" name="precio" [(ngModel)]="producto.precio" #precio="ngModel" required min="0.01">
         <!-- Mensaje de error para el precio -->
         <div *ngIf="precio.invalid && precio.touched" class="error">
             <div *ngIf="precio.errors?.['required']">El precio es obligatorio.</div>
