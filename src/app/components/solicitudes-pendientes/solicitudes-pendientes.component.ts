@@ -38,7 +38,7 @@ export class SolicitudesPendientesComponent implements OnInit {
           this.errorMessage = 'No se encontraron solicitudes pendientes.';
         } else {
           this.errorMessage = '';
-          this.solicitudes = data;
+          this.solicitudes = data.sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
         }
       },
       error: (e) => {
@@ -66,20 +66,26 @@ export class SolicitudesPendientesComponent implements OnInit {
   }
 
   abrirModalRecepcion(producto: any): void {
+    const cantidadPendiente = producto.ProductoSolicitud.cantidad;
+
     this.productoSeleccionado = producto;
 
-    // Usar prompt para pedir el número de unidades
     const unidades = prompt(`¿Cuántas unidades recibirás para ${producto.nombre}?`, '1');
 
     if (unidades !== null) {
       this.unidadesRecibidas = Number(unidades);
 
-      // Validar si la cantidad es válida
-      if (
-        this.unidadesRecibidas > 0 &&
-        this.unidadesRecibidas <= this.productoSeleccionado.ProductoSolicitud.cantidad
-      ) {
-        this.confirmarRecepcion(); // Llamar a la función para confirmar la recepción
+      if (cantidadPendiente - this.unidadesRecibidas == 0) {
+        this.confirmarRecepcion();
+        alert(`El producto ` + producto.nombre + ` ya no tiene unidades pendientes por recibir.`);
+
+        const quedanPendientes = this.solicitudSeleccionada?.Productos.some((p) => p.ProductoSolicitud.cantidad > 0);
+
+        if (!quedanPendientes) {
+          this.cerrarDetalles();
+        }
+      } else if (this.unidadesRecibidas > 0 && this.unidadesRecibidas <= cantidadPendiente) {
+        this.confirmarRecepcion();
       } else {
         alert('Cantidad inválida. Por favor, ingresa un número válido.');
       }
