@@ -35,7 +35,7 @@ export class HomeComponent {
   constructor(
     private readonly pedidoService: PedidoService,
     @Inject(PLATFORM_ID) private readonly platformId: Object
-  ) {}
+  ) { }
 
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -68,9 +68,9 @@ export class HomeComponent {
     this.productoMasVendido =
       this.productosVendidos.length > 0
         ? this.productosVendidos.reduce(
-            (max, prod) => (prod.totalVendidos > max.totalVendidos ? prod : max),
-            this.productosVendidos[0] // valor inicial
-          )
+          (max, prod) => (prod.totalVendidos > max.totalVendidos ? prod : max),
+          this.productosVendidos[0] // valor inicial
+        )
         : null;
   }
 
@@ -233,27 +233,31 @@ export class HomeComponent {
     const ctx = this.scatterChartRef.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const resumen = new Map<string, { precio: number; unidadesVendidas: number }>();
+    const resumen = new Map<number, number>(); // clave: precio, valor: unidades vendidas
 
     this.pedidosEntrantes.forEach((pedido) => {
       pedido.Productos.forEach((producto) => {
-        const nombre = producto.nombre;
-        const cantidad = producto.ProductoPedido.cantidad;
         const precio = producto.precio;
+        const cantidad = producto.ProductoPedido.cantidad;
 
-        if (!resumen.has(nombre)) {
-          resumen.set(nombre, { precio, unidadesVendidas: cantidad });
+        if (!resumen.has(precio)) {
+          resumen.set(precio, cantidad);
         } else {
-          const acumulado = resumen.get(nombre)!;
-          acumulado.unidadesVendidas += cantidad;
+          resumen.set(precio, resumen.get(precio)! + cantidad);
         }
       });
     });
 
-    const datosScatter = Array.from(resumen.values()).map((item) => ({
-      x: item.precio,
-      y: item.unidadesVendidas,
+    const datosScatter = Array.from(resumen.entries()).map(([precio, unidadesVendidas]) => ({
+      x: precio,
+      y: unidadesVendidas,
     }));
+
+
+    // Calcular mínimo y máximo de los precios
+    const precios = datosScatter.map((p) => p.x);
+    const minPrecio = Math.min(...precios) - 20;
+    const maxPrecio = Math.max(...precios) + 20;
 
     this.scatterChart = new Chart(ctx, {
       type: 'scatter',
@@ -286,6 +290,8 @@ export class HomeComponent {
         scales: {
           x: {
             title: { display: true, text: 'Precio (€)' },
+            min: minPrecio,
+            max: maxPrecio,
           },
           y: {
             title: { display: true, text: 'Unidades Vendidas' },
