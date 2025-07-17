@@ -254,8 +254,6 @@ export class RegistrarPedidoEntranteComponent implements OnInit {
 
       this.crearSolicitud(productosSolicitud);
     }
-
-    this.registrarPedido(true);
   }
 
   crearSolicitud(productos: any): void {
